@@ -46,12 +46,16 @@ export const ClerkProvider = ({ children }: Readonly<{ children: React.ReactNode
         },
         elements: {
           cardBox: {
-            boxShadow:
-              'rgba(0, 0, 0, 0.08) 0px 5px 5px 0px, rgba(25, 28, 33, 0.2) 0px 5px 5px -5px, rgba(0, 0, 0, 0.07) 0px 0px 0px 1px',
+            boxShadow: 'rgba(0, 0, 0, 0.1) 0px 1px 2px 0px',
           },
           card: {
-            backgroundColor: 'transparent',
+            backgroundColor: isDarkMode ? '#18181B' : '#F4F4F5',
             boxShadow: 'none',
+          },
+          footer: {
+            background: isDarkMode
+              ? 'linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)), linear-gradient(#18181B, #18181B)'
+              : 'linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)), linear-gradient(#F4F4F5, #F4F4F5)',
           },
         },
       }}

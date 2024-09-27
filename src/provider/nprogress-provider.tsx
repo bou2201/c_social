@@ -10,6 +10,7 @@ export const NProgressProvider = ({ children }: Readonly<{ children: React.React
     <>
       {children}
       <ProgressBar
+        key={theme}
         height="3px"
         color={theme === 'dark' ? '#FAFAFA' : '#09090B'}
         options={{ showSpinner: false }}
