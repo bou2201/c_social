@@ -9,5 +9,8 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_CLERK_SIGN_UP_URL: string;
     readonly NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: string;
     readonly NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: string;
+
+    // Clerk webhook
+    readonly CLERK_SIGNING_SECRET: string;
   }
 }

@@ -44,7 +44,7 @@ export const AppLayout = () => {
                 <Menu className="w-4 h-4" />
               </Button>
             }
-            title="Thông báo"
+            title="Danh mục"
             open={openSheet}
             setOpen={setOpenSheet}
           >
