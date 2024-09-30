@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { ReactNode } from 'react';
 
-const LayoutDynamic = dynamic(() => import('@/layouts/').then((res) => res.AppLayout), {
+const LayoutDynamic = dynamic(() => import('@/layouts').then((res) => res.AppLayout), {
   ssr: false,
 });
 

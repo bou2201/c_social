@@ -16,7 +16,9 @@ export const checkUserExists = async (id: string) => {
   }
 };
 
-export const createUser = async (user: User) => {
+export const createUser = async (user: Omit<User, 'banner_url' | 'banner_id'>) => {
+  const { id, first_name, last_name, email, image_url, username } = user;
+
   try {
     const hasExisted = await checkUserExists(user.id);
 
@@ -25,24 +27,72 @@ export const createUser = async (user: User) => {
     }
 
     await prisma.user.create({
-      data: user,
-    });
-
-    return Response.json({
-      status: HttpStatusCode.Created,
-      message: 'New user created successfully.',
+      data: { id, first_name, last_name, email, image_url, username },
     });
   } catch (error) {
     return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
   }
 };
 
-// export const updateUser = async (user:User) => {
-//   try {
-//     await prisma.user.update({
-//       where: {
-//         id:
-//       }
-//     })
-//   }
-// }
+export const updateUser = async (user: Omit<User, 'banner_url' | 'banner_id'>) => {
+  const { id, first_name, last_name, email, image_url, username } = user;
+
+  try {
+    await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        first_name,
+        last_name,
+        email,
+        image_url,
+        username,
+      },
+    });
+  } catch (error) {
+    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+  }
+};
+
+export const deleteUser = async (id: string) => {
+  try {
+    const hasExisted = await checkUserExists(id);
+
+    if (!hasExisted) {
+      return Response.json({ status: HttpStatusCode.Conflict, message: 'User not exists in db.' });
+    }
+
+    await prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+  }
+};
+
+export const getUser = async (id: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        email: true,
+        image_url: true,
+        username: true,
+        banner_id: true,
+        banner_url: true,
+      },
+    });
+
+    return Response.json({ message: 'Ok.', data: user }, { status: HttpStatusCode.Ok });
+  } catch (error) {
+    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+  }
+};

@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma:migrate": "npx prisma migrate dev --name init",
+    "prisma:db:pull": "npx prisma db pull",
+    "prisma:db:push": "npx prisma db push",
+    "prisma:migrate:init": "npx prisma migrate dev --name init",
+    "prisma:migrate:dev": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma generate",
+    "prisma:studio": "npx prisma studio",
     "lt:start": "lt -p 3000 -s csol"
   },
   "dependencies": {
