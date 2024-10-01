@@ -1,10 +1,17 @@
 {
   "name": "c_social",
   "version": "0.1.0",
+  "description": "A social network Nextjs project",
   "private": true,
+  "author": "Chuc Nguyen <lamchuc123456@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bou2201/c_social.git"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:db:pull": "npx prisma db pull",
