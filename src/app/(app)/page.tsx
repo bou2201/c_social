@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Connect, share, and discover new experiences with cSol.',
 };
 
-const HomePageDynamic = dynamic(() => import('@/pages/home').then((res) => res.default), {
+const HomePageDynamic = dynamic(() => import('@/page').then((res) => res.HomeComponent), {
   ssr: false,
 });
 

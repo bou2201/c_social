@@ -8,7 +8,7 @@ import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useState } from 'react';
 
-const HomeComponent = () => {
+export const HomeComponent = () => {
   const [openPostDialog, setOpenPostDialog] = useState<boolean>(false);
 
   const { user } = useUser();
@@ -42,5 +42,3 @@ const HomeComponent = () => {
     </>
   );
 };
-
-export default HomeComponent;
