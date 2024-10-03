@@ -1,21 +1,51 @@
 'use client';
 
 import { DisplaySheet } from '@/components/display-handler';
-import { NavLink, NavLinkResp } from '@/components/navigation';
+import { NavLink, NavLinkProps, NavLinkResp } from '@/components/navigation';
 import { Button } from '@/components/ui';
 import { Router } from '@/constants';
 import { UserButton } from '@clerk/nextjs';
 import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
-import { Menu, Plus } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { useState } from 'react';
-import { HEADER_NAVIGATION, HEADER_NAVIGATION_RESP } from './layout.const';
+import { HEADER_NAVIGATION_RESP } from './layout.const';
+import { Heart, House, Plus, Search, UserRound, Menu } from 'lucide-react';
+import { PostDialog } from '@/modules/post';
 
 export const AppLayout = () => {
   const { theme, setTheme } = useTheme();
 
   const [openSheet, setOpenSheet] = useState<boolean>(false);
+  const [openPostDialog, setOpenPostDialog] = useState<boolean>(false);
+
+  const HEADER_NAVIGATION: NavLinkProps[] = [
+    {
+      icon: <House className="w-6 h-6 opacity-70" />,
+      slug: Router.Home,
+      label: 'Trang chủ',
+    },
+    {
+      icon: <Search className="w-6 h-6 opacity-70" />,
+      slug: Router.Search,
+      label: 'Tìm kiếm',
+    },
+    {
+      icon: <Plus className="w-6 h-6 opacity-70" />,
+      label: 'Tạo',
+      onClick: () => setOpenPostDialog(true),
+    },
+    {
+      icon: <Heart className="w-6 h-6 opacity-70" />,
+      slug: Router.Notifications,
+      label: 'Thông báo',
+    },
+    {
+      icon: <UserRound className="w-6 h-6 opacity-70" />,
+      slug: Router.Me,
+      label: 'Trang cá nhân',
+    },
+  ];
 
   return (
     <>
@@ -73,15 +103,16 @@ export const AppLayout = () => {
           />
         </div>
       </header>
-
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => {}}
-        className="w-12 h-12 fixed bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground"
+        onClick={() => setOpenPostDialog(true)}
+        className="w-12 h-12 fixed bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground hover:scale-125 transform-gpu"
       >
         <Plus className="w-6 h-w-6 opacity-70 " />
       </Button>
+
+      <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />
     </>
   );
 };

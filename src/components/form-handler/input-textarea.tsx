@@ -1,6 +1,6 @@
 'use client';
 
-import { InputHTMLAttributes, ReactNode } from 'react';
+import { ReactNode, TextareaHTMLAttributes } from 'react';
 import { FieldPath, FieldValues, useFormContext } from 'react-hook-form';
 import {
   FormControl,
@@ -9,31 +9,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input,
-  InputDebounce,
+  Textarea,
+  TextareaDebounce,
 } from '../ui';
 
-type InputTextProps<T extends FieldValues> = {
+type InputTextAreaProps<T extends FieldValues> = {
   name: FieldPath<T>;
   label?: string;
   description?: string | ReactNode;
   className?: string;
-  inputProps?: InputHTMLAttributes<HTMLInputElement>;
+  textareaProps?: TextareaHTMLAttributes<HTMLTextAreaElement>;
   debounceDelay?: number;
   isDebounce?: boolean;
   disableMessage?: boolean;
 };
 
-export const InputText = <T extends FieldValues>({
+export const InputTextArea = <T extends FieldValues>({
   name,
   label,
   description,
   className,
-  inputProps,
+  textareaProps,
   debounceDelay,
   isDebounce,
   disableMessage = false,
-}: InputTextProps<T>) => {
+}: InputTextAreaProps<T>) => {
   const { control } = useFormContext<T>();
 
   return (
@@ -46,17 +46,17 @@ export const InputText = <T extends FieldValues>({
             {label && <FormLabel className="text-[13px]">{label}</FormLabel>}
             <FormControl>
               {isDebounce ? (
-                <InputDebounce
+                <TextareaDebounce
                   {...field}
-                  {...inputProps}
+                  {...textareaProps}
                   debounceDelay={debounceDelay}
-                  className={`${error && 'border-destructive'} ${inputProps?.className}`}
+                  className={`${error && 'border-destructive'} ${textareaProps?.className}`}
                 />
               ) : (
-                <Input
+                <Textarea
                   {...field}
-                  {...inputProps}
-                  className={`${error && 'border-destructive'} ${inputProps?.className}`}
+                  {...textareaProps}
+                  className={`${error && 'border-destructive'} ${textareaProps?.className}`}
                 />
               )}
             </FormControl>

@@ -14,13 +14,85 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// User schema
 model User {
-  id         String  @id
-  email      String? @unique
-  username   String? @unique
+  id         String    @id
+  email      String?   @unique
+  username   String?   @unique
   first_name String?
   last_name  String?
   image_url  String?
   banner_url String?
-  banner_id  String? @unique
+  banner_id  String?   @unique
+  Post       Post[]
+  Like       Like[]
+  Comment    Comment[]
+}
+
+// Post schema
+enum ImageType {
+  IMAGE
+  VIDEO
+  RAW
+  AUTO
+}
+
+model Image {
+  id            String    @id
+  asset_id      String
+  public_id     String
+  resource_type ImageType @default(IMAGE)
+  secure_url    String
+  signature     String
+  thumbnail_url String
+  url           String
+  path          String
+  post          Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId        Int?
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  content   String?
+  media     String?
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  images    Image[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  likes     Like[]
+  comments  Comment[]
+  trends    Trend[]
+}
+
+// Like schema
+model Like {
+  id        Int      @id @default(autoincrement())
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Comment schema
+model Comment {
+  id        Int      @id @default(autoincrement())
+  comment   String?
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Trend schema
+model Trend {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  slug   String @unique
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
 }

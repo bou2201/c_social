@@ -5,9 +5,11 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: [
         'http://localhost:3000/',
-        'https://csol.loca.lt',
         '*.http://localhost:3000/',
-        '*.https://csol.loca.lt'
+        'https://csol.loca.lt',
+        '*.https://csol.loca.lt',
+        'https://csol.vercel.app/',
+        '*.https://csol.vercel.app/'
       ],
       bodySizeLimit: "6mb",
     },

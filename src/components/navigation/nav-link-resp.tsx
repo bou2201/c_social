@@ -14,7 +14,7 @@ export const NavLinkResp = memo(({ slug, icon, label }: Omit<NavLinkProps, 'onCl
     if (slug === Router.Home) {
       return slug === pathname;
     } else {
-      return slug === pathname || pathname.startsWith(slug as string);
+      return slug === pathname || pathname?.startsWith(slug as string);
     }
   }, [pathname, slug]);
 

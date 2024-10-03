@@ -21,40 +21,34 @@ export const NavLink = memo(({ slug, icon, label, onClick }: NavLinkProps) => {
     if (slug === Router.Home) {
       return slug === pathname;
     } else {
-      return slug === pathname || pathname.startsWith(slug as string);
+      return slug === pathname || pathname?.startsWith(slug as string);
     }
   }, [pathname, slug]);
 
   if (onClick) {
     return (
-      <DisplayTooltip
-        content={label}
-        trigger={
-          <Button variant="ghost" size="icon" onClick={onClick} className="w-12 h-11">
-            {icon}
-          </Button>
-        }
-      />
+      <DisplayTooltip content={label}>
+        <Button variant="ghost" size="icon" onClick={onClick} className="w-12 h-11">
+          {icon}
+        </Button>
+      </DisplayTooltip>
     );
   }
 
   return (
     slug && (
       <Link href={slug}>
-        <DisplayTooltip
-          content={label}
-          trigger={
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`w-12 h-11 ${
-                getIsActive ? 'bg-csol_white_foreground dark:bg-csol_black_foreground' : ''
-              }`}
-            >
-              {icon}
-            </Button>
-          }
-        />
+        <DisplayTooltip content={label}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`w-12 h-11 ${
+              getIsActive ? 'bg-csol_white_foreground dark:bg-csol_black_foreground' : ''
+            }`}
+          >
+            {icon}
+          </Button>
+        </DisplayTooltip>
       </Link>
     )
   );

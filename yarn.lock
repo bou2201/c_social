@@ -116,6 +116,59 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudinary-util/types@npm:1.5.8":
+  version: 1.5.8
+  resolution: "@cloudinary-util/types@npm:1.5.8"
+  checksum: 10c0/b551794e6e471ed52305479e513f3ba673efea32a4b06da4f2c4437510102cb1d28a336cc69143a6cfbb1aca623ce0a8d9c8f4f7a677c2dd60619e8a0867bc36
+  languageName: node
+  linkType: hard
+
+"@cloudinary-util/url-loader@npm:5.10.3":
+  version: 5.10.3
+  resolution: "@cloudinary-util/url-loader@npm:5.10.3"
+  dependencies:
+    "@cloudinary-util/types": "npm:1.5.8"
+    "@cloudinary-util/util": "npm:3.3.2"
+    "@cloudinary/url-gen": "npm:1.15.0"
+    zod: "npm:^3.22.4"
+  checksum: 10c0/ab0b0d12def11897f79e6cc8cde22412caf28975d0e3ddab570cc669ecb8eb1b87f186eb0a6b10da03ed7c3017fe0d2b5e9c938e812a6fd1145545d65ee2067c
+  languageName: node
+  linkType: hard
+
+"@cloudinary-util/util@npm:3.3.2, @cloudinary-util/util@npm:^3.3.2":
+  version: 3.3.2
+  resolution: "@cloudinary-util/util@npm:3.3.2"
+  checksum: 10c0/65f58ea8914c3255343ca5ae119b54c723405aa30c65851c8bbed586a474b09f23041cd60cb4358e479cb31f23b6540c8af70303b40710878dc63be91e014c3b
+  languageName: node
+  linkType: hard
+
+"@cloudinary/transformation-builder-sdk@npm:^1.10.0, @cloudinary/transformation-builder-sdk@npm:^1.15.1":
+  version: 1.15.1
+  resolution: "@cloudinary/transformation-builder-sdk@npm:1.15.1"
+  dependencies:
+    "@cloudinary/url-gen": "npm:^1.7.0"
+  checksum: 10c0/0926bb8be01b437637dccdec4505e3fbaba9e334fe5a304dde0b9f8ecbffb6fac2605e00cc2d121ad7f3b52340509ce6963eda8682e9df09cfafab65f3ea463e
+  languageName: node
+  linkType: hard
+
+"@cloudinary/url-gen@npm:1.15.0":
+  version: 1.15.0
+  resolution: "@cloudinary/url-gen@npm:1.15.0"
+  dependencies:
+    "@cloudinary/transformation-builder-sdk": "npm:^1.10.0"
+  checksum: 10c0/4b50b690f40b117068d7396906e9bbda36bd4b8e6143bbc8ad57709cf18f7b3953611a414f56f6551680277e683c3e82f581b01d67e6d06ff88125f8c8f447d6
+  languageName: node
+  linkType: hard
+
+"@cloudinary/url-gen@npm:^1.7.0":
+  version: 1.21.0
+  resolution: "@cloudinary/url-gen@npm:1.21.0"
+  dependencies:
+    "@cloudinary/transformation-builder-sdk": "npm:^1.15.1"
+  checksum: 10c0/e8b776c0f116a53830b55322f2c23475d7da633bd11b9863dfb4cca1ef82ebc25b1a201f40bf70ecf955d111f295eebae1774d44743d09fc8dbe429334313044
+  languageName: node
+  linkType: hard
+
 "@eslint-community/eslint-utils@npm:^4.2.0, @eslint-community/eslint-utils@npm:^4.4.0":
   version: 4.4.0
   resolution: "@eslint-community/eslint-utils@npm:4.4.0"
@@ -1393,6 +1446,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tsconfig/recommended@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "@tsconfig/recommended@npm:1.0.7"
+  checksum: 10c0/54bdf928a779fa8f3734373b367017e5a9be55230d51df36d0a0a05487eebe05f6bd5072e4db36ebd61e06b34072b2ac4a8002a9cd3ce6c8777073cf0c251c6b
+  languageName: node
+  linkType: hard
+
 "@types/json5@npm:^0.0.29":
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
@@ -1933,6 +1993,7 @@ __metadata:
     eslint-config-next: "npm:14.2.13"
     lucide-react: "npm:^0.445.0"
     next: "npm:14.2.13"
+    next-cloudinary: "npm:^6.13.0"
     next-nprogress-bar: "npm:^2.3.13"
     next-themes: "npm:^0.3.0"
     postcss: "npm:^8"
@@ -4123,6 +4184,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"next-cloudinary@npm:^6.13.0":
+  version: 6.13.0
+  resolution: "next-cloudinary@npm:6.13.0"
+  dependencies:
+    "@cloudinary-util/types": "npm:1.5.8"
+    "@cloudinary-util/url-loader": "npm:5.10.3"
+    "@cloudinary-util/util": "npm:^3.3.2"
+    "@tsconfig/recommended": "npm:^1.0.7"
+  peerDependencies:
+    next: ^12 || ^13 || ^14 || >=15.0.0-rc
+    react: ^17 || ^18 || >=19.0.0-beta
+  checksum: 10c0/e64db46b52d59a3190d9e41fa311fdedaedb916d84827900bd9850685d1d8e716ef6e73ca1dbbc4c5ae2bab26b8dcaab06b31a7fa312556c37211b0a736c373e
+  languageName: node
+  linkType: hard
+
 "next-nprogress-bar@npm:^2.3.13":
   version: 2.3.13
   resolution: "next-nprogress-bar@npm:2.3.13"
@@ -5870,7 +5946,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.23.8":
+"zod@npm:^3.22.4, zod@npm:^3.23.8":
   version: 3.23.8
   resolution: "zod@npm:3.23.8"
   checksum: 10c0/8f14c87d6b1b53c944c25ce7a28616896319d95bc46a9660fe441adc0ed0a81253b02b5abdaeffedbeb23bdd25a0bf1c29d2c12dd919aef6447652dd295e3e69
