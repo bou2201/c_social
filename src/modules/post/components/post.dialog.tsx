@@ -11,14 +11,29 @@ import { useUser } from '@clerk/nextjs';
 import { getShortName } from '@/utils/func';
 import { InputTextArea } from '@/components/form-handler';
 import { Images, Smile } from 'lucide-react';
-import { CldUploadButton } from 'next-cloudinary';
+import { CldUploadButton, CloudinaryUploadWidgetInfo } from 'next-cloudinary';
+import { $Enums, Image } from '@prisma/client';
 
 const postFormSchema = z.object({
   content: z
     .string({ message: Message.required })
     .min(1, Message.required)
     .max(100, 'Tối đa 100 ký tự.'),
-  // files:
+  files: z
+    .array(
+      z.object({
+        id: z.string(),
+        asset_id: z.string(),
+        public_id: z.string(),
+        resource_type: z.nativeEnum($Enums.ImageType).default('IMAGE'),
+        secure_url: z.string(),
+        signature: z.string(),
+        thumbnail_url: z.string(),
+        url: z.string(),
+        path: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 type PostFormSchemaType = z.infer<typeof postFormSchema>;
@@ -63,8 +78,22 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
                 <CldUploadButton
                   uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESETS}
                   onSuccessAction={({ event, info }) => {
-                    console.log(event);
-                    console.log(info);
+                    const dataReturn = info as unknown as CloudinaryUploadWidgetInfo;
+
+                    const file: Image = {
+                      path: dataReturn.path,
+                      id: dataReturn.id,
+                      asset_id: dataReturn.asset_id,
+                      public_id: dataReturn.public_id,
+                      resource_type: dataReturn.resource_type as $Enums.ImageType,
+                      secure_url: dataReturn.secure_url,
+                      signature: dataReturn.signature ?? '',
+                      thumbnail_url: dataReturn.thumbnail_url ?? '',
+                      url: dataReturn.url,
+                      postId: null,
+                    };
+
+                    form.setValue('files', [...(form.watch('files') ?? []), file]);
                   }}
                 >
                   <DisplayTooltip content="Ảnh/video">

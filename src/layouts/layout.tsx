@@ -11,13 +11,15 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { HEADER_NAVIGATION_RESP } from './layout.const';
 import { Heart, House, Plus, Search, UserRound, Menu } from 'lucide-react';
-import { PostDialog } from '@/modules/post';
+import { PostDialog, postSelectors } from '@/modules/post';
 
 export const AppLayout = () => {
   const { theme, setTheme } = useTheme();
 
   const [openSheet, setOpenSheet] = useState<boolean>(false);
-  const [openPostDialog, setOpenPostDialog] = useState<boolean>(false);
+
+  const openPostDialog = postSelectors.isOpen();
+  const setOpenPostDialog = postSelectors.setIsOpen();
 
   const HEADER_NAVIGATION: NavLinkProps[] = [
     {

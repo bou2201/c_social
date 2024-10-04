@@ -2,14 +2,14 @@
 
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
 import { Router } from '@/constants';
-import { PostDialog } from '@/modules/post';
+import { PostDialog, postSelectors } from '@/modules/post';
 import { getShortName } from '@/utils/func';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
-import { useState } from 'react';
 
 export const HomeComponent = () => {
-  const [openPostDialog, setOpenPostDialog] = useState<boolean>(false);
+  const openPostDialog = postSelectors.isOpen();
+  const setOpenPostDialog = postSelectors.setIsOpen();
 
   const { user } = useUser();
 
