@@ -10,9 +10,11 @@ import { memo } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { getShortName } from '@/utils/func';
 import { InputTextArea } from '@/components/form-handler';
-import { Images, Smile } from 'lucide-react';
+import { Images, Smile, Trash } from 'lucide-react';
 import { CldUploadButton, CloudinaryUploadWidgetInfo } from 'next-cloudinary';
-import { $Enums, Image } from '@prisma/client';
+import { $Enums, File } from '@prisma/client';
+import { CldImage } from '@/components/images';
+import { deleteFile } from '@/actions/upload.action';
 
 const postFormSchema = z.object({
   content: z
@@ -25,7 +27,7 @@ const postFormSchema = z.object({
         id: z.string(),
         asset_id: z.string(),
         public_id: z.string(),
-        resource_type: z.nativeEnum($Enums.ImageType).default('IMAGE'),
+        resource_type: z.nativeEnum($Enums.FileType).default('IMAGE'),
         secure_url: z.string(),
         signature: z.string(),
         thumbnail_url: z.string(),
@@ -36,7 +38,7 @@ const postFormSchema = z.object({
     .optional(),
 });
 
-type PostFormSchemaType = z.infer<typeof postFormSchema>;
+export type PostFormSchemaType = z.infer<typeof postFormSchema>;
 
 export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean) => void }) => {
   const { user } = useUser();
@@ -45,11 +47,52 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
     resolver: zodResolver(postFormSchema),
     defaultValues: {
       content: '',
+      files: [],
     },
   });
 
+  const filesWatch = form.watch('files');
+
+  const handleUploadActionSuccess = ({
+    event,
+    info,
+  }: {
+    event: string | undefined;
+    info: string | CloudinaryUploadWidgetInfo | undefined;
+  }) => {
+    const dataReturn = info as unknown as CloudinaryUploadWidgetInfo;
+
+    const file: File = {
+      path: dataReturn.path,
+      id: dataReturn.id,
+      asset_id: dataReturn.asset_id,
+      public_id: dataReturn.public_id,
+      resource_type: dataReturn.resource_type.toUpperCase() as $Enums.FileType,
+      secure_url: dataReturn.secure_url,
+      signature: dataReturn.signature ?? '',
+      thumbnail_url: dataReturn.thumbnail_url ?? '',
+      url: dataReturn.url,
+      postId: null,
+    };
+
+    form.setValue('files', [...(form.watch('files') ?? []), file]);
+  };
+
+  const handleDeleteFile = async (path: string, public_id: string) => {
+    const updatedFiles = filesWatch?.filter((file) => file.path !== path);
+    form.setValue('files', updatedFiles);
+
+    await deleteFile(public_id);
+  };
+
   return (
-    <DisplayDialog {...props} title="Đăng tin" headerClass="!text-center" modal={false}>
+    <DisplayDialog
+      {...props}
+      title="Đăng tin"
+      headerClass="!text-center"
+      contentClass="max-w-xl"
+      modal={false}
+    >
       <Form {...form}>
         <form
           id="post-form"
@@ -74,27 +117,40 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
                 }}
               />
 
+              {filesWatch && filesWatch?.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                  {filesWatch.map((file, index) => (
+                    <div key={file.asset_id} className="relative">
+                      <CldImage
+                        src={file.public_id}
+                        alt={`Uploaded file ${index + 1}`}
+                        width={300}
+                        height={300}
+                        crop="fill"
+                        className="w-full h-24 object-cover rounded-md"
+                      />
+
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleDeleteFile(file.path, file.public_id);
+                        }}
+                        className="absolute -top-2 -right-2 w-7 h-7"
+                      >
+                        <Trash className="w-4 h-4 opacity-50" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex justify-start items-center gap-3 mt-4">
                 <CldUploadButton
                   uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESETS}
-                  onSuccessAction={({ event, info }) => {
-                    const dataReturn = info as unknown as CloudinaryUploadWidgetInfo;
-
-                    const file: Image = {
-                      path: dataReturn.path,
-                      id: dataReturn.id,
-                      asset_id: dataReturn.asset_id,
-                      public_id: dataReturn.public_id,
-                      resource_type: dataReturn.resource_type as $Enums.ImageType,
-                      secure_url: dataReturn.secure_url,
-                      signature: dataReturn.signature ?? '',
-                      thumbnail_url: dataReturn.thumbnail_url ?? '',
-                      url: dataReturn.url,
-                      postId: null,
-                    };
-
-                    form.setValue('files', [...(form.watch('files') ?? []), file]);
-                  }}
+                  onSuccessAction={({ event, info }) => handleUploadActionSuccess({ event, info })}
                 >
                   <DisplayTooltip content="Ảnh/video">
                     <Button

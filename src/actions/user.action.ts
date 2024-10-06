@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { ActionResponse } from '@/utils/action';
 import { User } from '@prisma/client';
 import { HttpStatusCode } from 'axios';
 
@@ -12,7 +13,9 @@ export const checkUserExists = async (id: string) => {
 
     return !!hasExisted;
   } catch (error) {
-    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
   }
 };
 
@@ -23,14 +26,16 @@ export const createUser = async (user: Omit<User, 'banner_url' | 'banner_id'>) =
     const hasExisted = await checkUserExists(user.id);
 
     if (hasExisted) {
-      return Response.json({ status: HttpStatusCode.Conflict, message: 'User already exists.' });
+      return ActionResponse.error('user already exists.', HttpStatusCode.Conflict);
     }
 
     await prisma.user.create({
       data: { id, first_name, last_name, email, image_url, username },
     });
   } catch (error) {
-    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
   }
 };
 
@@ -51,7 +56,9 @@ export const updateUser = async (user: Omit<User, 'banner_url' | 'banner_id'>) =
       },
     });
   } catch (error) {
-    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
   }
 };
 
@@ -60,7 +67,7 @@ export const deleteUser = async (id: string) => {
     const hasExisted = await checkUserExists(id);
 
     if (!hasExisted) {
-      return Response.json({ status: HttpStatusCode.Conflict, message: 'User not exists in db.' });
+      return ActionResponse.error('user not exists in db.', HttpStatusCode.NotFound);
     }
 
     await prisma.user.delete({
@@ -69,7 +76,9 @@ export const deleteUser = async (id: string) => {
       },
     });
   } catch (error) {
-    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
   }
 };
 
@@ -91,8 +100,10 @@ export const getUser = async (id: string) => {
       },
     });
 
-    return Response.json({ message: 'Ok.', data: user }, { status: HttpStatusCode.Ok });
+    return ActionResponse.success({ ...user }, 'ok.');
   } catch (error) {
-    return Response.json({ status: HttpStatusCode.InternalServerError, message: error });
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
   }
 };

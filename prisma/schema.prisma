@@ -24,30 +24,32 @@ model User {
   image_url  String?
   banner_url String?
   banner_id  String?   @unique
-  Post       Post[]
-  Like       Like[]
-  Comment    Comment[]
+  posts      Post[]
+  likes      Like[]
+  comments   Comment[]
 }
 
 // Post schema
-enum ImageType {
+enum FileType {
   IMAGE
   VIDEO
   RAW
   AUTO
+
+  @@map("ImageType")
 }
 
-model Image {
-  id            String    @id
+model File {
+  id            String   @id
   asset_id      String
   public_id     String
-  resource_type ImageType @default(IMAGE)
+  resource_type FileType @default(IMAGE)
   secure_url    String
   signature     String
   thumbnail_url String
   url           String
   path          String
-  post          Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post          Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId        Int?
 }
 
@@ -57,7 +59,7 @@ model Post {
   media     String?
   author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  images    Image[]
+  files     File[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   likes     Like[]
