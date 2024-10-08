@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode } from 'react';
 import {
   Sheet,
@@ -30,7 +32,7 @@ export const DisplaySheet = ({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent side={side}>
+      <SheetContent side={side} aria-describedby={undefined}>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           {description && <SheetDescription>{description}</SheetDescription>}

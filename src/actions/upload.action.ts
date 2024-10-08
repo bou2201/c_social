@@ -12,7 +12,28 @@ export const deleteFile = async (public_id: string) => {
 
     const result = await cld.uploader.destroy(public_id, { invalidate: true });
 
-    return ActionResponse.success({ ...result }, 'file deleted.');
+    return ActionResponse.success(result, 'file deleted.');
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
+  }
+};
+
+export const deleteFiles = async (public_ids: string[]) => {
+  try {
+    if (!public_ids || public_ids.length === 0) {
+      return ActionResponse.error('public_ids are required.');
+    }
+
+    const results = await Promise.all(
+      public_ids.map(async (public_id) => {
+        const result = await cld.uploader.destroy(public_id, { invalidate: true });
+        return result;
+      }),
+    );
+
+    return ActionResponse.success(results, 'files deleted.');
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);

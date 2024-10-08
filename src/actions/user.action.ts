@@ -100,7 +100,7 @@ export const getUser = async (id: string) => {
       },
     });
 
-    return ActionResponse.success({ ...user }, 'ok.');
+    return ActionResponse.success(user, 'ok.');
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
