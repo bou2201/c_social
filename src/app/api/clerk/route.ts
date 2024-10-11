@@ -1,6 +1,10 @@
-import { createUser, deleteUser, updateUser } from '@/actions/user.action';
-import type { UserWebhookEvent } from '@clerk/nextjs/server';
-import { User } from '@prisma/client';
+import { checkUserExists, createUser, deleteUser, updateUser } from '@/actions/user.action';
+import {
+  clerkClient,
+  type SessionWebhookEvent,
+  type UserJSON,
+  type UserWebhookEvent,
+} from '@clerk/nextjs/server';
 import { HttpStatusCode } from 'axios';
 import { headers } from 'next/headers';
 import { NextRequest } from 'next/server';
@@ -30,14 +34,15 @@ export async function POST(req: NextRequest) {
   const body = JSON.stringify(await req.json());
 
   const wh = new Webhook(CLERK_WEBHOOK_SECRET);
-  let evt: UserWebhookEvent;
+
+  let evt: UserWebhookEvent | SessionWebhookEvent;
 
   try {
     evt = wh.verify(body, {
       'svix-id': svix_id,
       'svix-timestamp': svix_timestamp,
       'svix-signature': svix_signature,
-    }) as UserWebhookEvent;
+    }) as UserWebhookEvent | SessionWebhookEvent;
   } catch (error) {
     console.error('Error verifying webhook:', error);
     return Response.json(
@@ -50,11 +55,32 @@ export async function POST(req: NextRequest) {
 
   const eventType = evt.type;
 
-  try {
-    const { id, first_name, last_name, email, email_addresses, image_url, username } =
-      evt.data as unknown as User & { email_addresses: { email_address: string }[] };
+  // Handle webhook session events
+  if (eventType === 'session.created') {
+    const existingUser = await checkUserExists(evt.data.user_id);
 
-    const email_address = email_addresses ? email_addresses[0].email_address : email;
+    if (!existingUser) {
+      const user = await clerkClient().users.getUser(evt.data.user_id);
+
+      await createUser({
+        id: user.id,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        email: user.emailAddresses?.[0].emailAddress ?? '',
+        image_url: user.imageUrl,
+        username: user.username,
+      });
+
+      return Response.json({ message: 'User created' }, { status: HttpStatusCode.Created });
+    }
+  }
+
+  // Handle webhook user events
+  try {
+    const { id, first_name, last_name, email_addresses, image_url, username } =
+      evt.data as UserJSON;
+
+    const email_address = email_addresses?.[0].email_address ?? '';
 
     switch (eventType) {
       case 'user.created':
@@ -67,6 +93,7 @@ export async function POST(req: NextRequest) {
           username,
         });
         return Response.json({ message: 'User created' }, { status: HttpStatusCode.Created });
+
       case 'user.updated':
         await updateUser({
           id,
@@ -77,9 +104,11 @@ export async function POST(req: NextRequest) {
           username,
         });
         return Response.json({ message: 'User updated' }, { status: HttpStatusCode.Ok });
+
       case 'user.deleted':
         await deleteUser(id);
         return Response.json({ message: 'User deleted' }, { status: HttpStatusCode.Ok });
+
       default:
         break;
     }
@@ -87,7 +116,7 @@ export async function POST(req: NextRequest) {
     console.error('Error handling event:', error);
 
     return Response.json(
-      { error: 'Error handling event: ' + (error as Error)?.message },
+      { error: 'Error handling event: ' + (error as Error)?.message, event: evt.type },
       {
         status: HttpStatusCode.InternalServerError,
       },

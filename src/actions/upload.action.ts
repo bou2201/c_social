@@ -10,7 +10,9 @@ export const deleteFile = async (public_id: string) => {
       return ActionResponse.error('public_id is required.');
     }
 
-    const result = await cld.uploader.destroy(public_id, { invalidate: true });
+    const result = await cld.uploader.destroy(public_id, { invalidate: true, type: 'upload' });
+
+    console.log(result);
 
     return ActionResponse.success(result, 'file deleted.');
   } catch (error) {
@@ -26,14 +28,11 @@ export const deleteFiles = async (public_ids: string[]) => {
       return ActionResponse.error('public_ids are required.');
     }
 
-    const results = await Promise.all(
-      public_ids.map(async (public_id) => {
-        const result = await cld.uploader.destroy(public_id, { invalidate: true });
-        return result;
-      }),
-    );
+    const result = await cld.api.delete_resources(public_ids, { type: 'upload' });
 
-    return ActionResponse.success(results, 'files deleted.');
+    console.log(result);
+
+    return ActionResponse.success(result, 'files deleted.');
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);

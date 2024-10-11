@@ -16,6 +16,9 @@ import { $Enums, File } from '@prisma/client';
 import { CldImage } from '@/components/images';
 import { deleteFile, deleteFiles } from '@/actions/upload.action';
 import { PostAlertDialog } from './post-alert.dialog';
+import { useToast } from '@/hooks';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createPost } from '@/actions/post.action';
 
 const postFormSchema = z.object({
   content: z
@@ -45,12 +48,36 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
   const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
 
   const { user } = useUser();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<PostFormSchemaType>({
     resolver: zodResolver(postFormSchema),
     defaultValues: {
       content: '',
       files: [],
+    },
+  });
+
+  const { mutate: execute, isPending } = useMutation({
+    mutationFn: (data: PostFormSchemaType) => createPost(data),
+    onSuccess: () => {
+      toast({
+        title: 'Đăng tin thành công',
+        description: 'Tin của bạn đã được đăng thành công.',
+      });
+      form.reset();
+      props.setOpen(false);
+
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+    onError: (error) => {
+      console.log(error.message);
+      toast({
+        variant: 'destructive',
+        title: 'Đăng tin thất bại',
+        description: 'Có lỗi xảy ra, vui lòng thử lại sau.',
+      });
     },
   });
 
@@ -109,7 +136,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
         <Form {...form}>
           <form
             id="post-form"
-            onSubmit={form.handleSubmit((data) => {})}
+            onSubmit={form.handleSubmit((data) => execute(data))}
             className="flex flex-col gap-4 max-sm:h-full"
           >
             <div className="flex flex-1 justify-start items-start gap-3">
@@ -204,7 +231,12 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
             </div>
 
             <div className="flex justify-end">
-              <Button variant="default" type="submit" disabled={!form.watch('content')}>
+              <Button
+                variant="default"
+                type="submit"
+                disabled={!form.watch('content') || isPending}
+                isLoading={isPending}
+              >
                 Đăng
               </Button>
             </div>

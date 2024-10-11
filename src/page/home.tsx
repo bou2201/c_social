@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
 import { Router } from '@/constants';
-import { PostDialog, postSelectors } from '@/modules/post';
+import { PostDialog, PostList, postSelectors } from '@/modules/post';
 import { getShortName } from '@/utils/func';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -36,6 +36,8 @@ export const HomeComponent = () => {
             Đăng
           </Button>
         </div>
+
+        <PostList id="all" />
       </div>
 
       <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />

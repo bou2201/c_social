@@ -1,0 +1,23 @@
+'use client';
+
+import { Skeleton } from '@/components/ui';
+import { PostDetails } from '../types/post-response.type';
+
+export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) => {
+  return <></>;
+};
+
+export const PostSkeleton = ({ postNumber }: { postNumber?: number }) => {
+  return (
+    <div className="py-5 px-6 border-t-csol_black/10 dark:border-t-csol_white/10">
+      <div className="flex justify-start items-start gap-4">
+        <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
+        <div className="space-y-3 flex-1">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      </div>
+    </div>
+  );
+};
