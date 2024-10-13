@@ -49,6 +49,8 @@ model File {
   thumbnail_url String
   url           String
   path          String
+  width         Int
+  height        Int
   post          Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId        Int?
 }

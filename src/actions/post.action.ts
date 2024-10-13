@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { PostFormSchemaType, GetPostResponse, PostDetails } from '@/modules/post';
+import { PostFormSchemaType, PostDetails } from '@/modules/post';
 import { ActionResponse } from '@/utils/action';
 import { currentUser } from '@clerk/nextjs/server';
 import { HttpStatusCode } from 'axios';
@@ -27,6 +27,9 @@ export const createPost = async (post: PostFormSchemaType) => {
         },
       },
     });
+    
+    console.log("🚀 ~ createPost ~ newPost:", newPost)
+
     if (fileData && fileData.length > 0) {
       await prisma.file.createMany({
         data: fileData.map((file) => ({

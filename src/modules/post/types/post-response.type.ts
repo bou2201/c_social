@@ -1,4 +1,4 @@
-import { Like, Post, User } from '@prisma/client';
+import { File, Like, Post, User } from '@prisma/client';
 
 export type PostDetails = Post & {
   author: User;

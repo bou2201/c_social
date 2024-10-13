@@ -13,21 +13,19 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
   const { toast } = useToast();
 
   const { data, error, isLoading, hasNextPage, fetchNextPage, isSuccess, isFetchingNextPage } =
-    useInfiniteQuery<GetPostResponse, Error>({
-      queryKey: ['posts', id],
-      queryFn: (({ pageParam = 0 }: { pageParam: unknown }) =>
-        getPosts(Number(pageParam), id)) as any,
-      initialPageParam: 0,
-      getNextPageParam: (lastPage) => lastPage.metadata.lastCursor,
-    });
-
+  useInfiniteQuery<GetPostResponse, Error>({
+    queryKey: ['posts', id],
+    queryFn: (({ pageParam}: { pageParam: unknown }) =>
+      getPosts(Number(pageParam), id)) as any,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.metadata.lastCursor,
+  });
+  
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
     }
   }, [fetchNextPage, hasNextPage, inView]);
-
-  console.log(data);
 
   const checkLastViewRef = (index: number, page: GetPostResponse) => {
     if (index === page.data.length - 1) {
@@ -55,10 +53,12 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
           page.data.map((post, index) =>
             checkLastViewRef(index, page) ? (
               <div ref={ref} key={post.id}>
-                1
+                <Post data={post} queryId={id} />
               </div>
             ) : (
-              <div key={post.id}>2</div>
+              <div key={post.id}>
+                <Post data={post} queryId={id} />
+              </div>
             ),
           ),
         )}

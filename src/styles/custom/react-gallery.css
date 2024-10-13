@@ -1,0 +1,7 @@
+.ReactGridGallery_tile {
+  @apply rounded-lg;
+}
+
+.ReactGridGallery_tile-viewport {
+  @apply border-csol_black/10 dark:border-csol_white/10 border-[1px] rounded-lg;
+}

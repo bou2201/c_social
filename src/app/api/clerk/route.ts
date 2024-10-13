@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       'svix-signature': svix_signature,
     }) as UserWebhookEvent | SessionWebhookEvent;
   } catch (error) {
-    console.error('Error verifying webhook:', error);
+    console.log("🚀 ~ POST ~ error:", error)
     return Response.json(
       { error: 'Error verifying webhook: ' + (error as Error)?.message },
       {
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
         break;
     }
   } catch (error) {
-    console.error('Error handling event:', error);
+    console.log("🚀 ~ POST ~ error:", error)
 
     return Response.json(
       { error: 'Error handling event: ' + (error as Error)?.message, event: evt.type },

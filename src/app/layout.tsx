@@ -4,7 +4,8 @@ import localFont from 'next/font/local';
 import { Toaster, TooltipProvider } from '@/components/ui';
 import { QueryProvider, ThemeProvider, ClerkProvider } from '@/provider';
 
-import './globals.css';
+import '@/styles/globals.css';
+import '@/styles/index.css';
 
 // Settings font
 const geistSans = localFont({

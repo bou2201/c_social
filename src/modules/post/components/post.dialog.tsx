@@ -37,6 +37,8 @@ const postFormSchema = z.object({
         thumbnail_url: z.string(),
         url: z.string(),
         path: z.string(),
+        width: z.number(),
+        height: z.number(),
       }),
     )
     .optional(),
@@ -72,7 +74,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: (error) => {
-      console.log(error.message);
+      console.log('🚀 ~ PostDialog ~ error:', error);
       toast({
         variant: 'destructive',
         title: 'Đăng tin thất bại',
@@ -102,6 +104,8 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
       signature: dataReturn.signature ?? '',
       thumbnail_url: dataReturn.thumbnail_url ?? '',
       url: dataReturn.url,
+      width: dataReturn.width,
+      height: dataReturn.height,
       postId: null,
     };
 

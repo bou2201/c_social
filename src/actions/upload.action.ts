@@ -12,7 +12,7 @@ export const deleteFile = async (public_id: string) => {
 
     const result = await cld.uploader.destroy(public_id, { invalidate: true, type: 'upload' });
 
-    console.log(result);
+    console.log('🚀 ~ deleteFile ~ result:', result);
 
     return ActionResponse.success(result, 'file deleted.');
   } catch (error) {
@@ -30,7 +30,7 @@ export const deleteFiles = async (public_ids: string[]) => {
 
     const result = await cld.api.delete_resources(public_ids, { type: 'upload' });
 
-    console.log(result);
+    console.log('🚀 ~ deleteFiles ~ result:', result);
 
     return ActionResponse.success(result, 'files deleted.');
   } catch (error) {
