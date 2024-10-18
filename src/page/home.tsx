@@ -17,7 +17,7 @@ export const HomeComponent = () => {
     <>
       <div className="bg-csol_white_foreground dark:bg-csol_black_foreground w-full flex flex-col sm:rounded-2xl border-csol_black/10 dark:border-csol_white/10 border-[1px]">
         {/* Top */}
-        <div className="py-5 px-6 flex justify-between items-center">
+        <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 flex justify-between items-center">
           <div className="flex items-center gap-5 flex-1">
             <Link href={Router.Me}>
               <Avatar>
@@ -40,7 +40,7 @@ export const HomeComponent = () => {
         <PostList id="all" />
       </div>
 
-      <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />
+      {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
     </>
   );
 };

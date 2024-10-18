@@ -19,12 +19,13 @@ import { PostAlertDialog } from './post-alert.dialog';
 import { useToast } from '@/hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createPost } from '@/actions/post.action';
+import { postSelectors } from '../post.store';
 
 const postFormSchema = z.object({
   content: z
     .string({ message: Message.required })
     .min(1, Message.required)
-    .max(100, 'Tối đa 100 ký tự.'),
+    .max(3000, 'Tối đa 3000 ký tự.'),
   files: z
     .array(
       z.object({
@@ -53,11 +54,14 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const postSelected = postSelectors.postSelected();
+  const setPostSelected = postSelectors.setPostSelected();
+
   const form = useForm<PostFormSchemaType>({
     resolver: zodResolver(postFormSchema),
-    defaultValues: {
-      content: '',
-      files: [],
+    values: {
+      content: postSelected?.content ?? '',
+      files: postSelected?.files ?? [],
     },
   });
 
@@ -114,15 +118,28 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
 
   const handleDeleteFile = async (path: string, public_id: string) => {
     const updatedFiles = filesWatch?.filter((file) => file.path !== path);
-    form.setValue('files', updatedFiles, { shouldDirty: true });
+    form.setValue('files', updatedFiles);
 
-    await deleteFile(public_id);
+    if (!postSelected) {
+      await deleteFile(public_id);
+    }
   };
 
   const handleCloseDialog = () => {
-    if (form.formState.isDirty || (filesWatch && filesWatch?.length > 0)) {
-      setOpenConfirmDelete(true);
+    const { content, files } = form.formState.dirtyFields;
+    const hasUnsavedChanges = content || files;
+
+    if (hasUnsavedChanges) {
+      if (!postSelected) {
+        setOpenConfirmDelete(true);
+      } else {
+        setPostSelected(null);
+        form.reset();
+        props.setOpen(false);
+      }
     } else {
+      setPostSelected(null);
+      form.reset();
       props.setOpen(false);
     }
   };
@@ -153,7 +170,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
 
                 <InputTextArea<PostFormSchemaType>
                   name="content"
-                  disableMessage
+                  // disableMessage
                   textareaProps={{
                     className: 'p-0 !mt-1 border-none focus-visible:ring-0 shadow-none',
                     placeholder: 'Có gì mới ...',
@@ -238,7 +255,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
               <Button
                 variant="default"
                 type="submit"
-                disabled={!form.watch('content') || isPending}
+                disabled={!form.watch('content') || isPending || !form.formState.isDirty}
                 isLoading={isPending}
               >
                 Đăng
@@ -248,19 +265,21 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
         </Form>
       </DisplayDialog>
 
-      <PostAlertDialog
-        open={openConfirmDelete}
-        setOpen={setOpenConfirmDelete}
-        onSubmit={async () => {
-          form.reset();
-          props.setOpen(false);
+      {openConfirmDelete && (
+        <PostAlertDialog
+          open={openConfirmDelete}
+          setOpen={setOpenConfirmDelete}
+          onSubmit={async () => {
+            form.reset();
+            props.setOpen(false);
 
-          const public_ids = filesWatch?.map((file) => file.public_id);
-          if (public_ids) {
-            await deleteFiles(public_ids);
-          }
-        }}
-      />
+            const public_ids = filesWatch?.map((file) => file.public_id);
+            if (public_ids) {
+              await deleteFiles(public_ids);
+            }
+          }}
+        />
+      )}
     </>
   );
 });

@@ -19,7 +19,7 @@ export const createPost = async (post: PostFormSchemaType) => {
     const newPost = await prisma.post.create({
       data: {
         content,
-        media: fileData?.[0].id ?? '',
+        media: fileData?.[0]?.id ?? '',
         author: {
           connect: {
             id: user?.id,
@@ -27,8 +27,8 @@ export const createPost = async (post: PostFormSchemaType) => {
         },
       },
     });
-    
-    console.log("🚀 ~ createPost ~ newPost:", newPost)
+
+    console.log('🚀 ~ createPost ~ newPost:', newPost);
 
     if (fileData && fileData.length > 0) {
       await prisma.file.createMany({
@@ -44,6 +44,94 @@ export const createPost = async (post: PostFormSchemaType) => {
       newPost,
       `Post created successfully at ${newPost.createdAt} - ID: ${newPost.id}`,
       HttpStatusCode.Created,
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
+  }
+};
+
+export const updatePost = async (postId: number, post: PostFormSchemaType) => {
+  const { content, files: fileData } = post;
+
+  try {
+    const existingPost = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!existingPost) {
+      return ActionResponse.error('post not found.', HttpStatusCode.NotFound);
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: { id: postId },
+      data: {
+        content,
+        media: fileData?.[0]?.id ?? existingPost.media,
+      },
+    });
+
+    if (fileData && fileData.length > 0) {
+      await prisma.file.deleteMany({
+        where: { postId: postId },
+      });
+
+      await prisma.file.createMany({
+        data: fileData.map((file) => ({
+          ...file,
+          postId: updatedPost.id,
+        })),
+      });
+    }
+
+    return ActionResponse.success(
+      updatedPost,
+      `Post updated successfully at ${updatedPost.updatedAt}`,
+      HttpStatusCode.Ok,
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
+  }
+};
+
+export const deletePost = async (postId: number) => {
+  try {
+    // Check if the post exists
+    const existingPost = await prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!existingPost) {
+      return ActionResponse.error('Post not found.', HttpStatusCode.NotFound);
+    }
+
+    // Delete associated files
+    await prisma.file.deleteMany({
+      where: { postId: postId },
+    });
+
+    // Delete associated likes
+    await prisma.like.deleteMany({
+      where: { postId: postId },
+    });
+
+    // Delete associated comments
+    await prisma.comment.deleteMany({
+      where: { postId: postId },
+    });
+
+    // Delete the post itself
+    const deletedPost = await prisma.post.delete({
+      where: { id: postId },
+    });
+
+    return ActionResponse.success(
+      deletedPost,
+      `Post deleted successfully - ID: ${deletedPost.id}`,
+      HttpStatusCode.Ok,
     );
   } catch (error) {
     if (error instanceof Error) {

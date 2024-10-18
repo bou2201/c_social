@@ -13,3 +13,13 @@ export const getShortName = (fullname: string) => {
 
   return shortName.toUpperCase();
 };
+
+export const getContent = (content: string, isExpanded: boolean, maxLength: number): string => {
+  if (isExpanded) {
+    return content?.replace(/\n/g, '<br/>') ?? '';
+  }
+
+  const truncatedContent = content?.slice(0, maxLength)?.replace(/\n/g, '<br/>') ?? '';
+  const needsEllipsis = content.length > maxLength;
+  return truncatedContent + (needsEllipsis ? '...' : '');
+};

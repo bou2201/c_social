@@ -114,7 +114,7 @@ export const AppLayout = () => {
         <Plus className="w-6 h-w-6 opacity-70 " />
       </Button>
 
-      <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />
+      {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
     </>
   );
 };

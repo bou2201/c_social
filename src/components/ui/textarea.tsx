@@ -10,7 +10,7 @@ export type TextareaDebounceProps = React.TextareaHTMLAttributes<HTMLTextAreaEle
 };
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, value, ...props }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
     // Use callback to avoid unnecessary re-renders
@@ -26,12 +26,20 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       requestAnimationFrame(handleResize);
     }, [handleResize]);
 
+    // Adjust height on initial render if value is present
+    React.useEffect(() => {
+      if (value) {
+        handleResize();
+      }
+    }, [value, handleResize]);
+
     return (
       <textarea
         className={cn(
           'flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 resize-none overflow-hidden text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
           className,
         )}
+        value={value}
         ref={(node) => {
           // Assign the forwarded ref and internal ref
           if (typeof ref === 'function') ref(node);

@@ -13,25 +13,20 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
   const { toast } = useToast();
 
   const { data, error, isLoading, hasNextPage, fetchNextPage, isSuccess, isFetchingNextPage } =
-  useInfiniteQuery<GetPostResponse, Error>({
-    queryKey: ['posts', id],
-    queryFn: (({ pageParam}: { pageParam: unknown }) =>
-      getPosts(Number(pageParam), id)) as any,
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.metadata.lastCursor,
-  });
-  
+    useInfiniteQuery<GetPostResponse, Error>({
+      queryKey: ['posts', id],
+      queryFn: (({ pageParam }: { pageParam: unknown }) => getPosts(Number(pageParam), id)) as any,
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => lastPage.metadata.lastCursor,
+    });
+
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
     }
   }, [fetchNextPage, hasNextPage, inView]);
 
-  const checkLastViewRef = (index: number, page: GetPostResponse) => {
-    if (index === page.data.length - 1) {
-      return true;
-    } else return false;
-  };
+  const checkLastViewRef = (index: number, page: GetPostResponse) => index === page.data.length - 1;
 
   if (error) {
     toast({
@@ -43,7 +38,7 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
   }
 
   if (isLoading) {
-    return <PostSkeleton />;
+    return <PostSkeleton postNumber={3} />;
   }
 
   if (isSuccess) {
