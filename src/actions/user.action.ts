@@ -82,11 +82,37 @@ export const deleteUser = async (id: string) => {
   }
 };
 
-export const getUser = async (id: string) => {
+export const getUserById = async (id: string) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
         id,
+      },
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        email: true,
+        image_url: true,
+        username: true,
+        banner_id: true,
+        banner_url: true,
+      },
+    });
+
+    return ActionResponse.success(user, 'ok.');
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
+  }
+};
+
+export const getUserByUsername = async (username: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        username,
       },
       select: {
         id: true,

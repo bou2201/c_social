@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import { Toaster, TooltipProvider } from '@/components/ui';
 import { QueryProvider, ThemeProvider, ClerkProvider } from '@/provider';
 
+import 'next-cloudinary/dist/cld-video-player.css';
 import '@/styles/globals.css';
 import '@/styles/index.css';
 

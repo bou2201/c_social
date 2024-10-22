@@ -19,6 +19,8 @@ import { CldImage } from '@/components/images';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Like } from '@/modules/like';
 import { Comment } from '@/modules/comment';
+import { $Enums } from '@prisma/client';
+import { CldVideoPlayer } from 'next-cloudinary';
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
@@ -38,10 +40,6 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
   const [openDeletePost, setOpenDeletePost] = useState<boolean>(false);
 
   const setPostSelected = postSelectors.setPostSelected();
-
-  const getImages = useMemo(() => {
-    return files.map((file) => ({ src: file.url, width: file.width, height: file.height }));
-  }, [files]);
 
   const getOptions = useMemo(() => {
     const userOptions: DisplayDropdownItemProps[] = [
@@ -81,7 +79,7 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
     return commonOptions;
   }, [data, setOpenUpdatePost, setPostSelected, user?.id]);
 
-  const { mutate: executeDelete } = useMutation({
+  const { mutate: executeDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => deletePost(data.id),
     onMutate: async () => {
       // Cancel any outgoing refetches to prevent conflicts
@@ -126,7 +124,6 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
       });
     },
     onSettled: () => {
-      setOpenDeletePost(false);
       // Refetch the posts query after mutation
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
@@ -156,7 +153,7 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
                 setOpen={setOpenDropdown}
                 trigger={
                   <Button size="icon" variant="ghost" className="h-7 w-7">
-                    <Ellipsis className="w-4 h-4 opa" />
+                    <Ellipsis className="w-4 h-4 opacity-80" />
                   </Button>
                 }
                 items={getOptions}
@@ -186,25 +183,57 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
             {files.length > 0 && (
               <ScrollContainer className="overflow-x-auto rounded-md mt-3">
                 <div className="flex items-stretch gap-2">
-                  {files.map((file, index) => (
-                    <CldImage
-                      src={file.public_id}
-                      alt={`images - ${index}`}
-                      key={file.public_id}
-                      width={250}
-                      height={250}
-                      className="h-[260px] w-auto object-cover rounded-md cursor-pointer"
-                      onClick={() => setImageIndex(index)}
-                      quality={100}
-                      loading="lazy"
-                    />
-                  ))}
+                  {files.map((file, index) =>
+                    file.resource_type === $Enums.FileType.VIDEO ? (
+                      <CldVideoPlayer
+                        src={file.public_id}
+                        key={file.public_id}
+                        width={250}
+                        height={250}
+                        className="min-h-[270px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
+                      />
+                    ) : (
+                      <CldImage
+                        src={file.public_id}
+                        alt={`images - ${index}`}
+                        key={file.public_id}
+                        width={250}
+                        height={250}
+                        className="h-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        onClick={() => setImageIndex(index)}
+                        quality={100}
+                        loading="lazy"
+                      />
+                    ),
+                  )}
                 </div>
               </ScrollContainer>
             )}
 
             <LightboxDynamic
-              slides={getImages}
+              slides={files.map((file) => {
+                if (file.resource_type === $Enums.FileType.VIDEO) {
+                  return {
+                    type: 'video',
+                    width: file.width,
+                    height: file.height,
+                    poster: file.thumbnail_url,
+                    sources: [
+                      {
+                        src: file.url,
+                        type: 'video/mp4',
+                      },
+                    ],
+                    download: `${file.url}?download`,
+                  };
+                }
+                return {
+                  src: file.url,
+                  width: file.width,
+                  height: file.height,
+                  download: `${file.url}?download`,
+                };
+              })}
               open={imageIndex >= 0}
               index={imageIndex}
               close={() => setImageIndex(-1)}
@@ -220,13 +249,12 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
 
       {openUpdatePost && <PostDialog open={openUpdatePost} setOpen={setOpenUpdatePost} />}
 
-      {openDeletePost && (
-        <PostAlertDeletePost
-          open={openDeletePost}
-          setOpen={setOpenDeletePost}
-          onSubmit={executeDelete}
-        />
-      )}
+      <PostAlertDeletePost
+        open={openDeletePost}
+        setOpen={setOpenDeletePost}
+        onSubmit={executeDelete}
+        isLoading={isDeletePending}
+      />
     </>
   );
 };

@@ -11,7 +11,7 @@ import { useUser } from '@clerk/nextjs';
 import { getShortName } from '@/utils/func';
 import { InputTextArea } from '@/components/form-handler';
 import { Images, Smile, X } from 'lucide-react';
-import { CldUploadButton, CloudinaryUploadWidgetInfo } from 'next-cloudinary';
+import { CldUploadButton, CldVideoPlayer, CloudinaryUploadWidgetInfo } from 'next-cloudinary';
 import { $Enums, File } from '@prisma/client';
 import { CldImage } from '@/components/images';
 import { deleteFile, deleteFiles } from '@/actions/upload.action';
@@ -40,6 +40,7 @@ const postFormSchema = z.object({
         path: z.string(),
         width: z.number(),
         height: z.number(),
+        postId: z.number().nullable().default(null),
       }),
     )
     .optional(),
@@ -149,7 +150,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
     <>
       <DisplayDialog
         {...props}
-        title="Đăng tin"
+        title={`${postSelected ? 'Sửa tin' : 'Đăng tin'}`}
         headerClass="!text-center"
         contentClass="max-w-xl"
         modal={false}
@@ -192,14 +193,23 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
                   >
                     {filesWatch.map((file, index) => (
                       <div key={file.asset_id} className="relative">
-                        <CldImage
-                          src={file.public_id}
-                          alt={`Uploaded file ${index + 1}`}
-                          width={300}
-                          height={300}
-                          crop="fill"
-                          className="w-full object-cover rounded-md"
-                        />
+                        {file.resource_type === $Enums.FileType.VIDEO ? (
+                          <CldVideoPlayer
+                            src={file.public_id}
+                            width={300}
+                            height={300}
+                            className="w-full object-cover rounded-md"
+                          />
+                        ) : (
+                          <CldImage
+                            src={file.public_id}
+                            alt={`Uploaded file ${index + 1}`}
+                            width={300}
+                            height={300}
+                            crop="fill"
+                            className="w-full object-cover rounded-md"
+                          />
+                        )}
 
                         <Button
                           variant="outline"
@@ -260,7 +270,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
                 disabled={!form.watch('content') || isPending || !form.formState.isDirty}
                 isLoading={isPending}
               >
-                Đăng
+                {postSelected ? 'Cập nhật' : 'Đăng'}
               </Button>
             </div>
           </form>

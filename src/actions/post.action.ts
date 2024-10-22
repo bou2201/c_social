@@ -5,6 +5,7 @@ import { PostFormSchemaType, PostDetails } from '@/modules/post';
 import { ActionResponse } from '@/utils/action';
 import { currentUser } from '@clerk/nextjs/server';
 import { HttpStatusCode } from 'axios';
+// import { deleteFile } from './upload.action';
 
 export const createPost = async (post: PostFormSchemaType) => {
   const { content, files: fileData } = post;
@@ -73,16 +74,25 @@ export const updatePost = async (postId: number, post: PostFormSchemaType) => {
     });
 
     if (fileData && fileData.length > 0) {
-      await prisma.file.deleteMany({
-        where: { postId: postId },
+      const fileIds = fileData.map((file) => file.public_id);
+
+      const existingFiles = await prisma.file.findMany({
+        where: { postId: postId, id: { in: fileIds } },
       });
 
-      await prisma.file.createMany({
-        data: fileData.map((file) => ({
-          ...file,
-          postId: updatedPost.id,
-        })),
-      });
+      const existingFileIds = existingFiles.map((file) => file.id);
+
+      const newFiles = fileData.filter((file) => !existingFileIds.includes(file.id));
+
+      if (newFiles.length > 0) {
+        await prisma.file.createMany({
+          data: newFiles.map((file) => ({
+            ...file,
+            postId: updatedPost.id,
+            id: file.public_id,
+          })),
+        });
+      }
     }
 
     return ActionResponse.success(
@@ -139,6 +149,36 @@ export const deletePost = async (postId: number) => {
     }
   }
 };
+
+// export const deleteImageFromPost = async (postId: number, fileId: string) => {
+//   try {
+//     const post = await prisma.post.findUnique({
+//       where: { id: postId },
+//       include: { files: true },
+//     });
+
+//     if (!post) {
+//       return ActionResponse.error('Post not found.', HttpStatusCode.NotFound);
+//     }
+
+//     const file = post.files.find((file) => file.id === fileId);
+//     if (!file) {
+//       return ActionResponse.error('File not found in the post.', HttpStatusCode.NotFound);
+//     }
+
+//     const deletedFile = await prisma.file.delete({
+//       where: { id: fileId },
+//     });
+
+//     await deleteFile(fileId);
+
+//     return ActionResponse.success(deletedFile, 'Image deleted successfully.', HttpStatusCode.Ok);
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+//     }
+//   }
+// };
 
 export const getPosts = async (lastCursor?: number | null, id: string = 'all') => {
   try {

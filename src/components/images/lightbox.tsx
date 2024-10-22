@@ -9,6 +9,8 @@ import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
 import Counter from 'yet-another-react-lightbox/plugins/counter';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
+import Download from 'yet-another-react-lightbox/plugins/download';
+import Video from "yet-another-react-lightbox/plugins/video";
 
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/counter.css';
@@ -25,7 +27,7 @@ export const Lightbox = (props: Readonly<Omit<LightboxExternalProps, 'plugins'>>
 
   return (
     <LightboxComponent
-      plugins={[Fullscreen, Counter, Zoom, Thumbnails]}
+      plugins={[Fullscreen, Counter, Zoom, Thumbnails, Download, Video]}
       zoom={{ ref: zoomRef, maxZoomPixelRatio: 3 }}
       fullscreen={{ ref: fullscreenRef }}
       thumbnails={{ ref: thumbnailsRef, border: 0 }}

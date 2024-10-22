@@ -8,9 +8,9 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+  Button,
 } from '../ui';
+import { CornerTopLeftIcon } from '@radix-ui/react-icons';
 
 type DisplayAlertDialogProps = {
   open: boolean;
@@ -18,6 +18,7 @@ type DisplayAlertDialogProps = {
   onSubmit?: () => void;
   title: string | ReactNode;
   description?: string;
+  isLoading?: boolean;
 };
 
 export const DisplayAlertDialog = ({
@@ -26,6 +27,7 @@ export const DisplayAlertDialog = ({
   onSubmit,
   title,
   description,
+  isLoading,
 }: DisplayAlertDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -35,16 +37,22 @@ export const DisplayAlertDialog = ({
           {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Huỷ</AlertDialogCancel>
-          <AlertDialogAction
+          <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+            Huỷ
+          </Button>
+          <Button
+            type="button"
+            variant="default"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               onSubmit?.();
-              setOpen(false);
             }}
+            disabled={isLoading}
           >
+            {isLoading && <CornerTopLeftIcon className="h-4 w-4 animate-spin mr-2" />}
             Xác nhận
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

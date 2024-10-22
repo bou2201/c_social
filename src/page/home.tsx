@@ -40,7 +40,9 @@ export const HomeComponent = () => {
         <PostList id="all" />
       </div>
 
-      {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
+      {openPostDialog && (
+        <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />
+      )}
     </>
   );
 };

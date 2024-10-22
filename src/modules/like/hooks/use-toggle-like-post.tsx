@@ -39,9 +39,8 @@ export const useToggleLikePost = (queryId: string) => {
                       ? post.likes.filter((like) => like.authorId !== user?.id)
                       : [...post.likes, { authorId: user?.id }],
                   };
-                } else {
-                  return post;
                 }
+                return post;
               }),
             })),
           };

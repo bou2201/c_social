@@ -3,4 +3,5 @@ export const Router = {
   Search: '/search',
   Notifications: '/notifications',
   Me: '/me',
+  ProfilePage: '/profile',
 };
