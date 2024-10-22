@@ -17,13 +17,15 @@ import { deletePost } from '@/actions/post.action';
 import { useToast } from '@/hooks';
 import { CldImage } from '@/components/images';
 import ScrollContainer from 'react-indiana-drag-scroll';
+import { Like } from '@/modules/like';
+import { Comment } from '@/modules/comment';
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
 const MAX_LENGTH_CONTENT = 300;
 
 export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) => {
-  const { author, content, files, createdAt } = data;
+  const { author, content, files, createdAt, likes, id } = data;
 
   const { user } = useUser();
   const { toast } = useToast();
@@ -207,6 +209,11 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
               index={imageIndex}
               close={() => setImageIndex(-1)}
             />
+
+            <div className="flex items-center mt-3">
+              <Like likes={likes} postId={id} queryId={queryId} />
+              <Comment />
+            </div>
           </div>
         </div>
       </div>

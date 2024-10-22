@@ -18,7 +18,7 @@ import { deleteFile, deleteFiles } from '@/actions/upload.action';
 import { PostAlertDialog } from './post-alert.dialog';
 import { useToast } from '@/hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createPost } from '@/actions/post.action';
+import { createPost, updatePost } from '@/actions/post.action';
 import { postSelectors } from '../post.store';
 
 const postFormSchema = z.object({
@@ -66,11 +66,12 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
   });
 
   const { mutate: execute, isPending } = useMutation({
-    mutationFn: (data: PostFormSchemaType) => createPost(data),
+    mutationFn: (data: PostFormSchemaType) =>
+      postSelected ? updatePost(postSelected.id, data) : createPost(data),
     onSuccess: () => {
       toast({
-        title: 'Đăng tin thành công',
-        description: 'Tin của bạn đã được đăng thành công.',
+        title: postSelected ? 'Sửa tin thành công' : 'Đăng tin thành công',
+        description: 'Cập nhật bài viết thành công.',
       });
       form.reset();
       props.setOpen(false);
@@ -175,6 +176,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
                     className: 'p-0 !mt-1 border-none focus-visible:ring-0 shadow-none',
                     placeholder: 'Có gì mới ...',
                     maxLength: 2000,
+                    autoFocus: true,
                   }}
                 />
 

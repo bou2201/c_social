@@ -17,7 +17,7 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
       queryKey: ['posts', id],
       queryFn: (({ pageParam }: { pageParam: unknown }) => getPosts(Number(pageParam), id)) as any,
       initialPageParam: 0,
-      getNextPageParam: (lastPage) => lastPage.metadata.lastCursor,
+      getNextPageParam: (lastPage) => lastPage?.metadata?.lastCursor ?? undefined,
     });
 
   useEffect(() => {
