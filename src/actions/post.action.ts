@@ -74,25 +74,42 @@ export const updatePost = async (postId: number, post: PostFormSchemaType) => {
     });
 
     if (fileData && fileData.length > 0) {
-      const fileIds = fileData.map((file) => file.public_id);
-
-      const existingFiles = await prisma.file.findMany({
-        where: { postId: postId, id: { in: fileIds } },
+      // Step 1: Delete existing files associated with the post
+      await prisma.file.deleteMany({
+        where: { postId: postId },
       });
 
-      const existingFileIds = existingFiles.map((file) => file.id);
-
-      const newFiles = fileData.filter((file) => !existingFileIds.includes(file.id));
+      // Step 2: Create new files
+      const newFiles = fileData.map((file) => ({
+        ...file,
+        postId: updatedPost.id,
+        id: file.public_id,
+      }));
 
       if (newFiles.length > 0) {
         await prisma.file.createMany({
-          data: newFiles.map((file) => ({
-            ...file,
-            postId: updatedPost.id,
-            id: file.public_id,
-          })),
+          data: newFiles,
         });
       }
+      // const fileIds = fileData.map((file) => file.public_id);
+
+      // const existingFiles = await prisma.file.findMany({
+      //   where: { postId: postId, id: { in: fileIds } },
+      // });
+
+      // const existingFileIds = existingFiles.map((file) => file.id);
+
+      // const newFiles = fileData.filter((file) => !existingFileIds.includes(file.id));
+
+      // if (newFiles.length > 0) {
+      //   await prisma.file.createMany({
+      //     data: newFiles.map((file) => ({
+      //       ...file,
+      //       postId: updatedPost.id,
+      //       id: file.public_id,
+      //     })),
+      //   });
+      // }
     }
 
     return ActionResponse.success(

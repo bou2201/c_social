@@ -120,7 +120,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
 
   const handleDeleteFile = async (path: string, public_id: string) => {
     const updatedFiles = filesWatch?.filter((file) => file.path !== path);
-    form.setValue('files', updatedFiles);
+    form.setValue('files', updatedFiles, { shouldDirty: true, shouldTouch: true });
 
     if (!postSelected) {
       await deleteFile(public_id);
