@@ -4,7 +4,6 @@ import localFont from 'next/font/local';
 import { Toaster, TooltipProvider } from '@/components/ui';
 import { QueryProvider, ThemeProvider, ClerkProvider } from '@/provider';
 
-import 'next-cloudinary/dist/cld-video-player.css';
 import '@/styles/globals.css';
 import '@/styles/index.css';
 
@@ -85,6 +84,9 @@ export default function RootLayout({
     <ClerkProvider>
       <QueryProvider>
         <html lang="en" suppressHydrationWarning>
+          <head>
+            <link rel="stylesheet" href="https://unpkg.com/cloudinary-video-player@2.1.0/dist/cld-video-player.css" />
+          </head>
           <body
             className={`${quickSandFont.className} ${geistMono.variable} ${geistSans.variable} antialiased`}
           >

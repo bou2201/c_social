@@ -2146,8 +2146,8 @@ __metadata:
     next-themes: "npm:^0.3.0"
     postcss: "npm:^8"
     prisma: "npm:^5.20.0"
-    react: "npm:^18"
-    react-dom: "npm:^18"
+    react: "npm:^18.3.1"
+    react-dom: "npm:^18.3.1"
     react-grid-gallery: "npm:^1.0.1"
     react-hook-form: "npm:^7.53.0"
     react-indiana-drag-scroll: "npm:^2.2.0"
@@ -4953,7 +4953,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^18":
+"react-dom@npm:^18.3.1":
   version: 18.3.1
   resolution: "react-dom@npm:18.3.1"
   dependencies:
@@ -5088,7 +5088,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18":
+"react@npm:^18.3.1":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
   dependencies:

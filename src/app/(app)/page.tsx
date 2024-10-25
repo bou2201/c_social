@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
+import ScrollToTop from '../scroll-to-top';
 
 export const metadata: Metadata = {
   title: 'cSol • Trang chủ',
@@ -11,7 +12,12 @@ const HomePageDynamic = dynamic(() => import('@/page').then((res) => res.HomeCom
 });
 
 const HomePage = () => {
-  return <HomePageDynamic />;
+  return (
+    <>
+      <ScrollToTop />
+      <HomePageDynamic />
+    </>
+  );
 };
 
 export default HomePage;

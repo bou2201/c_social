@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEventHandler, ReactNode } from 'react';
+import { Fragment, MouseEventHandler, ReactNode } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,10 +50,9 @@ export const DisplayDropdown = ({
           </>
         )}
         {items.map((item) => (
-          <>
+          <Fragment key={item.key}>
             <DropdownMenuItem
               onClick={item.onClick}
-              key={item.key}
               className={`min-w-[11rem] cursor-pointer [&>button]:w-full font-medium [&>button]:text-left ${
                 item.icon ? 'justify-between gap-2' : ''
               }`}
@@ -61,8 +60,8 @@ export const DisplayDropdown = ({
               {item.content}
               {item.icon}
             </DropdownMenuItem>
-            {item.isDivider && <DropdownMenuSeparator />}
-          </>
+            {item.isDivider && <DropdownMenuSeparator key={`${item.key}-separator`} />}
+          </Fragment>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

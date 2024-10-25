@@ -8,10 +8,10 @@ import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 
 export const HomeComponent = () => {
+  const { user } = useUser();
+
   const openPostDialog = postSelectors.isOpen();
   const setOpenPostDialog = postSelectors.setIsOpen();
-
-  const { user } = useUser();
 
   return (
     <>
@@ -19,20 +19,31 @@ export const HomeComponent = () => {
         {/* Top */}
         <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 flex justify-between items-center">
           <div className="flex items-center gap-5 flex-1">
-            <Link href={Router.Me}>
+            <Link href={`${Router.ProfilePage}/${user?.username}`}>
               <Avatar>
                 <AvatarImage src={user?.imageUrl} />
                 <AvatarFallback>{getShortName(user?.fullName ?? '')}</AvatarFallback>
               </Avatar>
             </Link>
             <div className="w-full cursor-text">
-              <p className="opacity-60 mb-0 text-sm" onClick={() => setOpenPostDialog(true)}>
+              <p
+                className="opacity-60 mb-0 text-sm"
+                role="presentation"
+                onClick={() => {
+                  if (!openPostDialog) setOpenPostDialog(true);
+                }}
+              >
                 Có gì mới?
               </p>
             </div>
           </div>
 
-          <Button variant="outline" onClick={() => setOpenPostDialog(true)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (!openPostDialog) setOpenPostDialog(true);
+            }}
+          >
             Đăng
           </Button>
         </div>
@@ -40,9 +51,7 @@ export const HomeComponent = () => {
         <PostList id="all" />
       </div>
 
-      {openPostDialog && (
-        <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />
-      )}
+      {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
     </>
   );
 };

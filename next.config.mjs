@@ -9,9 +9,9 @@ const nextConfig = {
         'https://csol.loca.lt',
         '*.https://csol.loca.lt',
         'https://csol.vercel.app/',
-        '*.https://csol.vercel.app/'
+        '*.https://csol.vercel.app/',
       ],
-      bodySizeLimit: "6mb",
+      bodySizeLimit: '6mb',
     },
   },
   images: {
@@ -22,8 +22,14 @@ const nextConfig = {
         port: '',
         pathname: '**',
       },
-    ]
-  }
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+        port: '',
+        pathname: '**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

@@ -14,11 +14,11 @@ type LikeProps = {
 };
 
 export const Like = ({ queryId, likes, postId }: LikeProps) => {
-  const { mutate } = useToggleLikePost(queryId);
-  const { user } = useUser();
-
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isBouncing, setIsBouncing] = useState<boolean>(false);
+
+  const { mutate } = useToggleLikePost(queryId);
+  const { user } = useUser();
 
   useEffect(() => {
     setIsLiked(likes.some((like) => like.authorId === user?.id));

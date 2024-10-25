@@ -20,8 +20,8 @@ export const NavLinkResp = memo(({ slug, icon, label }: Omit<NavLinkProps, 'onCl
 
   return (
     slug && (
-      <SheetClose asChild>
-        <Link href={slug} className="w-full">
+      <SheetClose asChild key={slug}>
+        <Link href={slug} className="w-full" >
           <Button
             variant="ghost"
             size="icon"

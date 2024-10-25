@@ -15,31 +15,32 @@ import { PostAlertDeletePost } from './post-alert.dialog';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePost } from '@/actions/post.action';
 import { useToast } from '@/hooks';
-import { CldImage } from '@/components/images';
+import { CldImage, CldVideoPlayer } from '@/components/images';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Like } from '@/modules/like';
 import { Comment } from '@/modules/comment';
 import { $Enums } from '@prisma/client';
-import { CldVideoPlayer } from 'next-cloudinary';
+import Link from 'next/link';
+import { Router } from '@/constants';
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
 const MAX_LENGTH_CONTENT = 300;
 
 export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) => {
-  const { author, content, files, createdAt, likes, id } = data;
-
-  const { user } = useUser();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const [imageIndex, setImageIndex] = useState<number>(-1);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
   const [openUpdatePost, setOpenUpdatePost] = useState<boolean>(false);
   const [openDeletePost, setOpenDeletePost] = useState<boolean>(false);
 
+  const { user } = useUser();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const setPostSelected = postSelectors.setPostSelected();
+
+  const { author, content, files, createdAt, likes, id } = data;
 
   const getOptions = useMemo(() => {
     const userOptions: DisplayDropdownItemProps[] = [
@@ -133,12 +134,14 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
     <>
       <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 border-t-csol_black/10 dark:border-t-csol_white/10 border-t-[1px]">
         <div className="flex justify-start items-start gap-4">
-          <Avatar className="h-10 w-10 flex-shrink-0">
-            <AvatarImage src={author.image_url ?? ''} />
-            <AvatarFallback>
-              {getShortName(`${author.first_name} ${author.last_name}`)}
-            </AvatarFallback>
-          </Avatar>
+          <Link href={`${Router.ProfilePage}/${author.username}`}>
+            <Avatar className="h-10 w-10 flex-shrink-0">
+              <AvatarImage src={author.image_url ?? ''} />
+              <AvatarFallback>
+                {getShortName(`${author.first_name} ${author.last_name}`)}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-1">
@@ -188,9 +191,15 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
                       <CldVideoPlayer
                         src={file.public_id}
                         key={file.public_id}
+                        id={`video-player-${file.public_id}`}
                         width={250}
                         height={250}
                         className="min-h-[270px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        transformation={{
+                          streaming_profile: 'hd',
+                        }}
+                        sourceTypes={['hls']}
+                        pictureInPictureToggle
                       />
                     ) : (
                       <CldImage
@@ -202,7 +211,7 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
                         className="h-[270px] w-auto object-cover rounded-md cursor-pointer"
                         onClick={() => setImageIndex(index)}
                         quality={100}
-                        loading="lazy"
+                        priority
                       />
                     ),
                   )}

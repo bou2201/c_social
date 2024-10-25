@@ -27,7 +27,7 @@ export const NavLink = memo(({ slug, icon, label, onClick }: NavLinkProps) => {
 
   if (onClick) {
     return (
-      <DisplayTooltip content={label}>
+      <DisplayTooltip content={label} key={slug}>
         <Button variant="ghost" size="icon" onClick={onClick} className="w-12 h-11">
           {icon}
         </Button>
@@ -37,7 +37,7 @@ export const NavLink = memo(({ slug, icon, label, onClick }: NavLinkProps) => {
 
   return (
     slug && (
-      <Link href={slug}>
+      <Link href={slug} key={slug}>
         <DisplayTooltip content={label}>
           <Button
             variant="ghost"

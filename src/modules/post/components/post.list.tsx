@@ -9,8 +9,8 @@ import { Post, PostSkeleton } from './post';
 import { useToast } from '@/hooks';
 
 export const PostList = ({ id = 'all' }: { id: string }) => {
-  const { ref, inView } = useInView();
   const { toast } = useToast();
+  const { ref, inView } = useInView();
 
   const { data, error, isLoading, hasNextPage, fetchNextPage, isSuccess, isFetchingNextPage } =
     useInfiniteQuery<GetPostResponse, Error>({
@@ -38,14 +38,14 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
   }
 
   if (isLoading) {
-    return <PostSkeleton postNumber={3} />;
+    return <PostSkeleton postNumber={5} />;
   }
 
   if (isSuccess) {
     return (
       <div className="flex flex-col">
-        {data?.pages.map((page) =>
-          page.data.map((post, index) =>
+        {data?.pages?.map((page) =>
+          page?.data?.map((post, index) =>
             checkLastViewRef(index, page) ? (
               <div ref={ref} key={post.id}>
                 <Post data={post} queryId={id} />

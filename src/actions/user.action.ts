@@ -2,8 +2,9 @@
 
 import prisma from '@/lib/prisma';
 import { ActionResponse } from '@/utils/action';
-import { User } from '@prisma/client';
+import { File, User } from '@prisma/client';
 import { HttpStatusCode } from 'axios';
+import { deleteFile } from './upload.action';
 
 export const checkUserExists = async (id: string) => {
   try {
@@ -127,6 +128,28 @@ export const getUserByUsername = async (username: string) => {
     });
 
     return ActionResponse.success(user, 'ok.');
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
+  }
+};
+
+export const updateUserBanner = async (userId: string, file: File, oldBannerId?: string) => {
+  try {
+    if (oldBannerId) {
+      await deleteFile(oldBannerId);
+    }
+
+    const newBanner = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        banner_id: file.public_id,
+        banner_url: file.secure_url,
+      },
+    });
+
+    return ActionResponse.success(newBanner, 'ok.');
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);

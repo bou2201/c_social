@@ -1,4 +1,5 @@
 export * from './cld-image';
+export * from './cld-video-player';
 
 export * from './gallery-image';
 

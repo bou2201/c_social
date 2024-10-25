@@ -28,14 +28,14 @@ export const Lightbox = (props: Readonly<Omit<LightboxExternalProps, 'plugins'>>
   return (
     <LightboxComponent
       plugins={[Fullscreen, Counter, Zoom, Thumbnails, Download, Video]}
-      zoom={{ ref: zoomRef, maxZoomPixelRatio: 3 }}
+      zoom={{ ref: zoomRef, maxZoomPixelRatio: 3,  }}
       fullscreen={{ ref: fullscreenRef }}
       thumbnails={{ ref: thumbnailsRef, border: 0 }}
       counter={{ container: { style: { top: 0, left: 0 } } }}
       carousel={{
         spacing: 0,
-        padding: 0,
-        imageFit: 'cover',
+        padding: '24px',
+        imageFit: 'contain',
         finite: true,
       }}
       {...props}

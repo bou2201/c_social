@@ -4,50 +4,77 @@ import { DisplaySheet } from '@/components/display-handler';
 import { NavLink, NavLinkProps, NavLinkResp } from '@/components/navigation';
 import { Button } from '@/components/ui';
 import { Router } from '@/constants';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useUser } from '@clerk/nextjs';
 import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
-import { useState } from 'react';
-import { HEADER_NAVIGATION_RESP } from './layout.const';
+import { useMemo, useState } from 'react';
 import { Heart, House, Plus, Search, UserRound, Menu } from 'lucide-react';
 import { PostDialog, postSelectors } from '@/modules/post';
 
 export const AppLayout = () => {
-  const { theme, setTheme } = useTheme();
-
   const [openSheet, setOpenSheet] = useState<boolean>(false);
+
+  const { user } = useUser();
+  const { theme, setTheme } = useTheme();
 
   const openPostDialog = postSelectors.isOpen();
   const setOpenPostDialog = postSelectors.setIsOpen();
 
-  const HEADER_NAVIGATION: NavLinkProps[] = [
-    {
-      icon: <House className="w-6 h-6 opacity-70" />,
-      slug: Router.Home,
-      label: 'Trang chủ',
-    },
-    {
-      icon: <Search className="w-6 h-6 opacity-70" />,
-      slug: Router.Search,
-      label: 'Tìm kiếm',
-    },
-    {
-      icon: <Plus className="w-6 h-6 opacity-70" />,
-      label: 'Tạo',
-      onClick: () => setOpenPostDialog(true),
-    },
-    {
-      icon: <Heart className="w-6 h-6 opacity-70" />,
-      slug: Router.Notifications,
-      label: 'Thông báo',
-    },
-    {
-      icon: <UserRound className="w-6 h-6 opacity-70" />,
-      slug: Router.Me,
-      label: 'Trang cá nhân',
-    },
-  ];
+  const HEADER_NAVIGATION: NavLinkProps[] = useMemo(() => {
+    return [
+      {
+        icon: <House className="w-6 h-6 opacity-70" />,
+        slug: Router.Home,
+        label: 'Trang chủ',
+      },
+      {
+        icon: <Search className="w-6 h-6 opacity-70" />,
+        slug: Router.Search,
+        label: 'Tìm kiếm',
+      },
+      {
+        icon: <Plus className="w-6 h-6 opacity-70" />,
+        label: 'Tạo',
+        onClick: () => setOpenPostDialog(true),
+      },
+      {
+        icon: <Heart className="w-6 h-6 opacity-70" />,
+        slug: Router.Notifications,
+        label: 'Thông báo',
+      },
+      {
+        icon: <UserRound className="w-6 h-6 opacity-70" />,
+        slug: Router.ProfilePage + '/' + user?.username,
+        label: 'Trang cá nhân',
+      },
+    ];
+  }, [setOpenPostDialog, user?.username]);
+
+  const HEADER_NAVIGATION_RESP: Omit<NavLinkProps, 'onClick'>[] = useMemo(() => {
+    return [
+      {
+        icon: <House className="w-6 h-6 mr-2 opacity-70" />,
+        slug: Router.Home,
+        label: 'Trang chủ',
+      },
+      {
+        icon: <Search className="w-6 h-6 mr-2 opacity-70" />,
+        slug: Router.Search,
+        label: 'Tìm kiếm',
+      },
+      {
+        icon: <Heart className="w-6 h-6 mr-2 opacity-70" />,
+        slug: Router.Notifications,
+        label: 'Thông báo',
+      },
+      {
+        icon: <UserRound className="w-6 h-6 mr-2 opacity-70" />,
+        slug: Router.ProfilePage + '/' + user?.username,
+        label: 'Trang cá nhân',
+      },
+    ];
+  }, [user?.username]);
 
   return (
     <>
