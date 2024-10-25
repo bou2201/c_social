@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: true,
+  staticPageGenerationTimeout: 1000,
+  serverRuntimeConfig: {
+    requestTimeout: 30000,
+  },
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
     serverActions: {

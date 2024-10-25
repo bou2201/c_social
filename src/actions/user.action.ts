@@ -148,8 +148,29 @@ export const updateUserBanner = async (userId: string, file: File, oldBannerId?:
         banner_url: file.secure_url,
       },
     });
+    
+    console.log("🚀 ~ updateUserBanner ~ newBanner:", newBanner)
 
     return ActionResponse.success(newBanner, 'ok.');
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
+  }
+};
+
+export const updateUserAvatar = async (userId: string, file: File) => {
+  try {
+    const newAvatar = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        image_url: file.secure_url,
+      },
+    });
+    
+    console.log("🚀 ~ updateUserAvatar ~ newAvatar:", newAvatar)
+
+    return ActionResponse.success(newAvatar, 'ok.');
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);

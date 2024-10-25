@@ -177,7 +177,6 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
                     className: 'p-0 !mt-1 border-none focus-visible:ring-0 shadow-none',
                     placeholder: 'Có gì mới ...',
                     maxLength: 2000,
-                    autoFocus: true,
                   }}
                 />
 

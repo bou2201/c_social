@@ -13,11 +13,18 @@ export type TabProps = {
 export type DisplayTabsProps = {
   tabs: TabProps[];
   className?: string;
+  classNameTabList?: string;
   notRedirect?: boolean;
   block?: boolean;
 };
 
-export const DisplayTabs = ({ tabs, className, notRedirect, block }: DisplayTabsProps) => {
+export const DisplayTabs = ({
+  tabs,
+  className,
+  classNameTabList,
+  notRedirect,
+  block,
+}: DisplayTabsProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const currentTab = useSearchParams().get('tab');
@@ -36,30 +43,32 @@ export const DisplayTabs = ({ tabs, className, notRedirect, block }: DisplayTabs
 
   return (
     <Tabs defaultValue={value} className={className}>
-      <TabsList
-        style={
-          block
-            ? {
-                gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
-                width: '100%',
-                display: 'grid',
-              }
-            : {}
-        }
-      >
-        {tabs.map((tab) => (
-          <TabsTrigger
-            value={tab.value}
-            key={tab.value}
-            onClick={(e) => {
-              e.preventDefault();
-              handleChangeTab(tab.value);
-            }}
-          >
-            {tab.name}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className={classNameTabList}>
+        <TabsList
+          style={
+            block
+              ? {
+                  gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
+                  width: '100%',
+                  display: 'grid',
+                }
+              : {}
+          }
+        >
+          {tabs.map((tab) => (
+            <TabsTrigger
+              value={tab.value}
+              key={tab.value}
+              onClick={(e) => {
+                e.preventDefault();
+                handleChangeTab(tab.value);
+              }}
+            >
+              {tab.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
 
       {tabs.map((tab) => (
         <TabsContent value={tab.value} key={tab.value}>

@@ -199,7 +199,6 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
                           streaming_profile: 'hd',
                         }}
                         sourceTypes={['hls']}
-                        pictureInPictureToggle
                       />
                     ) : (
                       <CldImage

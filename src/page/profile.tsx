@@ -5,7 +5,7 @@ import { DisplayTabs, DisplayTabsProps } from '@/components/display-handler';
 import { Avatar, AvatarFallback, AvatarImage, Button, Skeleton } from '@/components/ui';
 import { Breakpoint } from '@/constants';
 import { useToast, useWindowSize } from '@/hooks';
-import { PostDialog, postSelectors } from '@/modules/post';
+import { PostDialog, PostList, postSelectors } from '@/modules/post';
 import { getShortName } from '@/utils/func';
 import { useUser } from '@clerk/nextjs';
 import { File } from '@prisma/client';
@@ -13,14 +13,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { CldUploadButton } from 'next-cloudinary';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
 import { useMemo } from 'react';
 
 export const ProfileComponent = ({ username }: { username: string }) => {
+  const { user } = useUser();
   const { width } = useWindowSize();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user } = useUser();
 
   const { mutate: executeUpdateBanner } = useMutation({
     mutationFn: (params: { userId: string; file: File; oldBannerId?: string }) =>
@@ -72,7 +71,7 @@ export const ProfileComponent = ({ username }: { username: string }) => {
   }, [profile]);
 
   if (isError) {
-    return notFound();
+    console.log('🚀 ~ ProfileComponent ~ isError:', isError);
   }
 
   const getFullname = () => {
@@ -155,9 +154,11 @@ export const ProfileComponent = ({ username }: { username: string }) => {
             </p>
           </div>
 
-          <div className="max-sm:py-4 py-5 max-sm:px-4 px-6">
-            <DisplayTabs tabs={PROFILE_TABS} block={Number(width) > Breakpoint.sm} />
-          </div>
+          <DisplayTabs
+            tabs={PROFILE_TABS}
+            block={Number(width) > Breakpoint.sm}
+            classNameTabList="max-sm:py-4 py-5 max-sm:px-4 px-6"
+          />
         </>
       )}
     </div>
@@ -180,41 +181,47 @@ const ProfileSkeleton = () => {
 };
 
 const ProfilePost = ({ profile }: { profile: Awaited<ReturnType<typeof getUserByUsername>> }) => {
+  const { user } = useUser();
   const openPostDialog = postSelectors.isOpen();
   const setOpenPostDialog = postSelectors.setIsOpen();
 
   return (
     <>
-      <div className="py-3 flex justify-between items-center">
-        <div className="flex items-center gap-5 flex-1">
-          <Avatar>
-            <AvatarImage src={profile?.data?.image_url as string} />
-            <AvatarFallback>{getShortName(profile?.data?.username ?? '')}</AvatarFallback>
-          </Avatar>
-          <div className="w-full cursor-text">
-            <p
-              className="opacity-60 mb-0 text-sm"
-              role="presentation"
+      {profile?.data?.id === user?.id && (
+        <>
+          <div className="flex justify-between items-center pb-5 max-sm:px-4 px-6">
+            <div className="flex items-center gap-5 flex-1">
+              <Avatar>
+                <AvatarImage src={profile?.data?.image_url as string} />
+                <AvatarFallback>{getShortName(profile?.data?.username ?? '')}</AvatarFallback>
+              </Avatar>
+              <div className="w-full cursor-text">
+                <p
+                  className="opacity-60 mb-0 text-sm"
+                  role="presentation"
+                  onClick={() => {
+                    if (!openPostDialog) setOpenPostDialog(true);
+                  }}
+                >
+                  Có gì mới?
+                </p>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
               onClick={() => {
                 if (!openPostDialog) setOpenPostDialog(true);
               }}
             >
-              Có gì mới?
-            </p>
+              Đăng
+            </Button>
           </div>
-        </div>
+          {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
+        </>
+      )}
 
-        <Button
-          variant="outline"
-          onClick={() => {
-            if (!openPostDialog) setOpenPostDialog(true);
-          }}
-        >
-          Đăng
-        </Button>
-      </div>
-
-      {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
+      <PostList id={profile?.data?.id as string} />
     </>
   );
 };
