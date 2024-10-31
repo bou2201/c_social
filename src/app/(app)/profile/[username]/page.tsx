@@ -19,10 +19,9 @@ export async function generateMetadata({ params }: ProfilePageProps): Promise<Me
     };
   }
 
-  const title = `${userProfile.data?.first_name ?? ''} ${userProfile.data?.last_name ?? ''} (@${
-    userProfile.data?.username
-  }) • Trang cá nhân`;
-  const description = `Trang cá nhân (@${userProfile.data?.username})`;
+  const { first_name = '', last_name = '', username = '', image_url } = userProfile.data || {};
+  const title = `${first_name} ${last_name} (@${username}) • Trang cá nhân`;
+  const description = `Trang cá nhân (@${username})`;
 
   return {
     title,
@@ -30,13 +29,13 @@ export async function generateMetadata({ params }: ProfilePageProps): Promise<Me
     openGraph: {
       title,
       description,
-      images: userProfile.data?.image_url ? [{ url: userProfile.data?.image_url }] : undefined,
+      images: image_url ? [{ url: image_url }] : [],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: userProfile.data?.image_url ?? undefined,
+      images: image_url ? [image_url] : [],
     },
   };
 }

@@ -5,7 +5,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import { GetPostResponse } from '../types/post-response.type';
 import { useEffect } from 'react';
-import { Post, PostSkeleton } from './post';
+import { Post } from './post';
+import { PostSkeleton } from './post.skeleton';
 import { useToast } from '@/hooks';
 
 export const PostList = ({ id = 'all' }: { id: string }) => {

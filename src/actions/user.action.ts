@@ -127,7 +127,7 @@ export const getUserByUsername = async (username: string) => {
       },
     });
 
-    return ActionResponse.success(user, 'ok.');
+    return ActionResponse.success(user || null, 'ok.');
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);

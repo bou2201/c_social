@@ -17,9 +17,10 @@ import { CldImage } from '@/components/images';
 import { deleteFile, deleteFiles } from '@/actions/upload.action';
 import { PostAlertDialog } from './post-alert.dialog';
 import { useToast } from '@/hooks';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPost, updatePost } from '@/actions/post.action';
 import { postSelectors } from '../post.store';
+import { getUserByUsername } from '@/actions/user.action';
 
 const postFormSchema = z.object({
   content: z
@@ -64,6 +65,11 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
       content: postSelected?.content ?? '',
       files: postSelected?.files ?? [],
     },
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.username],
+    queryFn: () => getUserByUsername(user?.username as string),
   });
 
   const { mutate: execute, isPending } = useMutation({
@@ -164,7 +170,7 @@ export const PostDialog = memo((props: { open: boolean; setOpen: (open: boolean)
           >
             <div className="flex flex-1 justify-start items-start gap-3">
               <Avatar>
-                <AvatarImage src={user?.imageUrl} />
+                <AvatarImage src={profile?.data?.image_url ?? ''} className="object-cover" />
                 <AvatarFallback>{getShortName(user?.fullName ?? '')}</AvatarFallback>
               </Avatar>
               <div className="flex-1">

@@ -1,14 +1,21 @@
 'use client';
 
+import { getUserByUsername } from '@/actions/user.action';
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
 import { Router } from '@/constants';
 import { PostDialog, PostList, postSelectors } from '@/modules/post';
 import { getShortName } from '@/utils/func';
 import { useUser } from '@clerk/nextjs';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 
 export const HomeComponent = () => {
   const { user } = useUser();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.username],
+    queryFn: () => getUserByUsername(user?.username as string),
+  });
 
   const openPostDialog = postSelectors.isOpen();
   const setOpenPostDialog = postSelectors.setIsOpen();
@@ -21,7 +28,7 @@ export const HomeComponent = () => {
           <div className="flex items-center gap-5 flex-1">
             <Link href={`${Router.ProfilePage}/${user?.username}`}>
               <Avatar>
-                <AvatarImage src={user?.imageUrl} />
+                <AvatarImage src={profile?.data?.image_url ?? ''} className="object-cover" />
                 <AvatarFallback>{getShortName(user?.fullName ?? '')}</AvatarFallback>
               </Avatar>
             </Link>

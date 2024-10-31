@@ -14,6 +14,7 @@
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "clean:cache": "yarn cache clean",
     "env:dev": "dotenv -e .env -- dotenv -e .env.local -- next dev",
     "env:prod": "dotenv -e .env -- dotenv -e .env.production -- npx prisma generate && next build",
     "prisma:db:pull": "npx prisma db pull",
