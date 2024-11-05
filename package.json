@@ -23,7 +23,10 @@
     "prisma:migrate:dev": "npx prisma migrate dev",
     "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
-    "lt:start": "lt -p 3000 -s csol"
+    "lt:start": "lt -p 3000 -s csol",
+    "check-types": "tsc --noEmit",
+    "turbo:build": "turbo build check-types",
+    "turbo:dev": "turbo dev"
   },
   "dependencies": {
     "@clerk/localizations": "^3.0.4",
@@ -82,6 +85,7 @@
     "postcss": "^8",
     "prisma": "^5.20.0",
     "tailwindcss": "^3.4.1",
+    "turbo": "^2.2.3",
     "typescript": "^5"
   },
   "packageManager": "yarn@4.5.0"
