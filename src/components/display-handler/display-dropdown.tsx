@@ -19,7 +19,7 @@ export type DisplayDropdownItemProps = {
 };
 
 export type DisplayDropdownProps = {
-  trigger: ReactNode | string;
+  trigger: ReactNode;
   label?: string;
   items: DisplayDropdownItemProps[];
   className?: string;

@@ -1,25 +1,36 @@
 'use client';
 
-import { DisplaySheet } from '@/components/display-handler';
+import { DisplayPopover, DisplaySheet } from '@/components/display-handler';
 import { NavLink, NavLinkProps, NavLinkResp } from '@/components/navigation';
-import { Button } from '@/components/ui';
+import { Avatar, AvatarFallback, AvatarImage, Button, Separator } from '@/components/ui';
 import { Router } from '@/constants';
-import { UserButton, useUser } from '@clerk/nextjs';
+import { useClerk, useUser } from '@clerk/nextjs';
 import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
-import { Heart, House, Plus, Search, UserRound, Menu } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { Heart, House, Plus, Search, UserRound, Menu, LogOut } from 'lucide-react';
 import { PostDialog, postSelectors } from '@/modules/post';
+import { getShortName } from '@/utils/func';
+import { getUserByUsername } from '@/actions/user.action';
+import { useQuery } from '@tanstack/react-query';
+import { PopoverClose } from '@radix-ui/react-popover';
 
 export const AppLayout = () => {
   const [openSheet, setOpenSheet] = useState<boolean>(false);
+  const [openPopoverAvt, setOpenPopoverAvt] = useState<boolean>(false);
 
+  const { signOut } = useClerk();
   const { user } = useUser();
   const { theme, setTheme } = useTheme();
 
   const openPostDialog = postSelectors.isOpen();
   const setOpenPostDialog = postSelectors.setIsOpen();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.username],
+    queryFn: () => getUserByUsername(user?.username as string),
+  });
 
   const HEADER_NAVIGATION: NavLinkProps[] = useMemo(() => {
     return [
@@ -76,6 +87,22 @@ export const AppLayout = () => {
     ];
   }, [user?.username]);
 
+  const renderAvatarButton = useCallback(() => {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="w-10 h-10 rounded-full"
+        onClick={() => setOpenPopoverAvt(true)}
+      >
+        <Avatar className="h-full w-full flex-shrink-0">
+          <AvatarImage src={profile?.data?.image_url ?? ''} className="object-cover" />
+          <AvatarFallback>{getShortName(`${user?.firstName} ${user?.lastName}`)}</AvatarFallback>
+        </Avatar>
+      </Button>
+    );
+  }, [profile, user]);
+
   return (
     <>
       <header className="px-4 py-2 flex items-center gap-3 fixed z-50 top-0 w-full bg-white dark:bg-csol_black">
@@ -123,13 +150,47 @@ export const AppLayout = () => {
             {theme === 'dark' ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
           </Button>
 
-          <UserButton
-            appearance={{
-              elements: {
-                userButtonAvatarBox: 'w-10 h-10',
-              },
-            }}
-          />
+          <DisplayPopover
+            open={openPopoverAvt}
+            setOpen={setOpenPopoverAvt}
+            trigger={renderAvatarButton()}
+            className="w-80"
+          >
+            <div className="flex gap-4">
+              <Avatar className="h-10 w-10 flex-shrink-0">
+                <AvatarImage src={profile?.data?.image_url ?? ''} className="object-cover" />
+                <AvatarFallback>
+                  {getShortName(`${user?.firstName} ${user?.lastName}`)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-semibold">
+                  {`${profile?.data?.first_name ?? '...'} ${profile?.data?.last_name}`}
+                </p>
+                <span className="opacity-70 text-sm">@{profile?.data?.username}</span>
+              </div>
+            </div>
+
+            <Separator className="mt-4 mb-2" />
+
+            <Link href={Router.ProfilePage + '/' + user?.username}>
+              <PopoverClose asChild>
+                <Button
+                  className="opacity-80 w-full !gap-5 justify-start mb-1"
+                  variant="ghost"
+                >
+                  <UserRound className="w-4 h-4" /> Trang cá nhân
+                </Button>
+              </PopoverClose>
+            </Link>
+            <Button
+              className="opacity-80 w-full !gap-5 justify-start"
+              variant="ghost"
+              onClick={() => signOut({ redirectUrl: Router.SignIn })}
+            >
+              <LogOut className="w-4 h-4" /> Đăng xuất
+            </Button>
+          </DisplayPopover>
         </div>
       </header>
       <Button

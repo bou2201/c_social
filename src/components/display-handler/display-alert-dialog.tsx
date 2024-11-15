@@ -16,7 +16,7 @@ type DisplayAlertDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
   onSubmit?: () => void;
-  title: string | ReactNode;
+  title: ReactNode;
   description?: string;
   isLoading?: boolean;
 };

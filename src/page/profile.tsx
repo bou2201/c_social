@@ -55,6 +55,7 @@ export const ProfileComponent = ({ username }: { username: string }) => {
     queryKey: ['profile', username],
     queryFn: () => getUserByUsername(username),
   });
+  
   const isCurrentUser = String(profile?.data?.id) === user?.id;
 
   const PROFILE_TABS: DisplayTabsProps['tabs'] = useMemo(() => {

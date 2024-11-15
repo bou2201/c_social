@@ -13,8 +13,8 @@ import {
 type DisplaySheetProps = {
   trigger: ReactNode;
   children: ReactNode;
-  title: string | ReactNode;
-  description?: string | ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
   side?: 'top' | 'bottom' | 'left' | 'right';
   open: boolean;
   setOpen: (open: boolean) => void;

@@ -15,9 +15,9 @@ type DisplayDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
   onClose?: () => void;
-  title: string | ReactNode;
+  title: string;
   description?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   contentClass?: string;
   headerClass?: string;
   modal?: boolean;

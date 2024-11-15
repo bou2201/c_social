@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 
 type DisplayPropsTooltip = {
-  children: ReactNode | string;
+  children: ReactNode;
   content: string;
   className?: string;
   side?: 'top' | 'right' | 'bottom' | 'left';
