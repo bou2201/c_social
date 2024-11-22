@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { PostFormSchemaType, PostDetails } from '@/modules/post';
+import { PostFormSchemaType, PostDetailsResponse } from '@/modules/post';
 import { ActionResponse } from '@/utils/action';
 import { currentUser } from '@clerk/nextjs/server';
 import { HttpStatusCode } from 'axios';

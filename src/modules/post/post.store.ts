@@ -1,15 +1,15 @@
 import { createSelectors } from '@/lib/zustand';
 import { create } from 'zustand';
-import { PostDetails } from './types/post-response.type';
+import { PostDetailsResponse } from './types/post-response.type';
 
 type PostState = {
   isOpen: boolean;
-  postSelected: PostDetails | null;
+  postSelected: PostDetailsResponse | null;
 };
 
 type PostActions = {
   setIsOpen: (value: boolean) => void;
-  setPostSelected: (post: PostDetails | null) => void;
+  setPostSelected: (post: PostDetailsResponse | null) => void;
   reset: () => void;
 };
 

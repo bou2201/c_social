@@ -115,7 +115,7 @@ export const ProfileComponent = ({ username }: { username: string }) => {
 
     if (banner_id && banner_url) {
       return (
-        <div className="relative h-56 w-full group">
+        <div className="relative h-60 w-full group">
           <Image
             src={banner_url}
             alt="Wallpaper Image"
@@ -142,7 +142,7 @@ export const ProfileComponent = ({ username }: { username: string }) => {
           <ProfileSkeleton />
         ) : (
           <>
-            <div className="relative h-56 bg-csol_black/10 dark:bg-csol_black/50">
+            <div className="relative h-60 bg-csol_black/10 dark:bg-csol_black/50">
               {renderWallpaper()}
               <div className="absolute -bottom-[84px] max-sm:left-4 left-6 max-sm:right-4 right-6 flex justify-between">
                 <div></div>

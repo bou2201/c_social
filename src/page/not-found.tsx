@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui';
 import { Router } from '@/constants';
 import { MoveLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next-nprogress-bar';
 
 export const NotFound = () => {
   const router = useRouter();

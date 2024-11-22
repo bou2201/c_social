@@ -1,6 +1,6 @@
 import { File, Like, Post, User } from '@prisma/client';
 
-export type PostDetails = Post & {
+export type PostDetailsResponse = Post & {
   author: User;
   files: File[];
   likes: Like[];
@@ -15,6 +15,6 @@ export type PostMetadata = {
 };
 
 export type GetPostResponse = {
-  data: PostDetails[];
+  data: PostDetailsResponse[];
   metadata: PostMetadata;
 };

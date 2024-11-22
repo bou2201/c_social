@@ -76,7 +76,6 @@ export const ProfileAvatarDialog = memo(({ open, setOpen, profile }: ProfileAvat
         <CldUploadButton
           uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESETS}
           onSuccessAction={({ event, info }) => {
-            console.log(typeof info, info);
             setFile(info as unknown as File);
           }}
         >
@@ -87,7 +86,9 @@ export const ProfileAvatarDialog = memo(({ open, setOpen, profile }: ProfileAvat
       </div>
 
       <div className="w-full flex justify-end items-center gap-3 mt-5">
-        <Button variant="outline">Đóng</Button>
+        <Button variant="outline" onClick={() => setOpen(false)}>
+          Đóng
+        </Button>
         <Button
           variant="default"
           disabled={!file}

@@ -2,7 +2,8 @@
 
 import { ReactNode, useCallback, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next-nprogress-bar';
 
 export type TabProps = {
   value: string;

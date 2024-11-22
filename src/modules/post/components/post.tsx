@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
-import { GetPostResponse, PostDetails } from '../types/post-response.type';
+import { GetPostResponse, PostDetailsResponse } from '../types/post-response.type';
 import { getContent, getShortName } from '@/utils/func';
 import dayjs from '@/lib/dayjs';
 import { Ellipsis, LinkIcon, Pencil, Trash } from 'lucide-react';
@@ -22,12 +22,13 @@ import { Comment } from '@/modules/comment';
 import { $Enums } from '@prisma/client';
 import Link from 'next/link';
 import { Router } from '@/constants';
+import { useRouter } from 'next-nprogress-bar';
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
 const MAX_LENGTH_CONTENT = 300;
 
-export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) => {
+export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: string }) => {
   const [imageIndex, setImageIndex] = useState<number>(-1);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
@@ -36,6 +37,7 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
 
   const { user } = useUser();
   const { toast } = useToast();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const setPostSelected = postSelectors.setPostSelected();
@@ -136,7 +138,7 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
         <div className="flex justify-start items-start gap-4">
           <Link href={`${Router.ProfilePage}/${author.username}`}>
             <Avatar className="h-10 w-10 flex-shrink-0">
-              <AvatarImage src={author.image_url ?? ''} className="object-cover"/>
+              <AvatarImage src={author.image_url ?? ''} className="object-cover" />
               <AvatarFallback>
                 {getShortName(`${author.first_name} ${author.last_name}`)}
               </AvatarFallback>
@@ -249,7 +251,7 @@ export const Post = ({ data, queryId }: { data: PostDetails; queryId: string }) 
 
             <div className="flex items-center mt-3">
               <Like likes={likes} postId={id} queryId={queryId} />
-              <Comment />
+              <Comment author={author} postId={id} />
             </div>
           </div>
         </div>

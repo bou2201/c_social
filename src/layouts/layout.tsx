@@ -13,8 +13,10 @@ import { Heart, House, Plus, Search, UserRound, Menu, LogOut } from 'lucide-reac
 import { PostDialog, postSelectors } from '@/modules/post';
 import { getShortName } from '@/utils/func';
 import { getUserByUsername } from '@/actions/user.action';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { PopoverClose } from '@radix-ui/react-popover';
+import LoadingPage from '@/app/loading';
+import BackToTop from '@/app/back-to-top';
 
 export const AppLayout = () => {
   const [openSheet, setOpenSheet] = useState<boolean>(false);
@@ -30,6 +32,10 @@ export const AppLayout = () => {
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.username],
     queryFn: () => getUserByUsername(user?.username as string),
+  });
+
+  const { mutate: executeLogout, isPending: isLoadingLogout } = useMutation({
+    mutationFn: () => signOut({ redirectUrl: Router.SignIn }),
   });
 
   const HEADER_NAVIGATION: NavLinkProps[] = useMemo(() => {
@@ -103,6 +109,10 @@ export const AppLayout = () => {
     );
   }, [profile, user]);
 
+  if (isLoadingLogout) {
+    return <LoadingPage />;
+  }
+
   return (
     <>
       <header className="px-4 py-2 flex items-center gap-3 fixed z-50 top-0 w-full bg-white dark:bg-csol_black">
@@ -154,7 +164,7 @@ export const AppLayout = () => {
             open={openPopoverAvt}
             setOpen={setOpenPopoverAvt}
             trigger={renderAvatarButton()}
-            className="w-80"
+            className="w-72"
           >
             <div className="flex gap-4">
               <Avatar className="h-10 w-10 flex-shrink-0">
@@ -175,10 +185,7 @@ export const AppLayout = () => {
 
             <Link href={Router.ProfilePage + '/' + user?.username}>
               <PopoverClose asChild>
-                <Button
-                  className="opacity-80 w-full !gap-5 justify-start mb-1"
-                  variant="ghost"
-                >
+                <Button className="opacity-80 w-full !gap-5 justify-start mb-1" variant="ghost">
                   <UserRound className="w-4 h-4" /> Trang cá nhân
                 </Button>
               </PopoverClose>
@@ -186,7 +193,7 @@ export const AppLayout = () => {
             <Button
               className="opacity-80 w-full !gap-5 justify-start"
               variant="ghost"
-              onClick={() => signOut({ redirectUrl: Router.SignIn })}
+              onClick={() => executeLogout()}
             >
               <LogOut className="w-4 h-4" /> Đăng xuất
             </Button>
@@ -197,10 +204,12 @@ export const AppLayout = () => {
         variant="ghost"
         size="icon"
         onClick={() => setOpenPostDialog(true)}
-        className="w-12 h-12 fixed bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground hover:scale-125 transform-gpu"
+        className="w-12 h-12 fixed max-md:hidden bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground hover:scale-125 transform-gpu"
       >
         <Plus className="w-6 h-w-6 opacity-70 " />
       </Button>
+
+      <BackToTop />
 
       {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
     </>
