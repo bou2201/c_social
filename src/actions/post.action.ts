@@ -247,7 +247,7 @@ export const getPosts = async (lastCursor?: number | null, id: string = 'all') =
     });
 
     return {
-      data: posts as unknown as PostDetails[],
+      data: posts as unknown as PostDetailsResponse[],
       metadata: {
         lastCursor: cursor,
         hasMore: morePosts.length > 0,
