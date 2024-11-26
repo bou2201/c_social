@@ -247,12 +247,40 @@ export const getPosts = async (lastCursor?: number | null, id: string = 'all') =
     });
 
     return {
-      data: posts as unknown as PostDetails[],
+      data: posts as unknown as PostDetailsResponse[],
       metadata: {
         lastCursor: cursor,
         hasMore: morePosts.length > 0,
       },
     };
+  } catch (error) {
+    if (error instanceof Error) {
+      return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);
+    }
+  }
+};
+
+export const getPost = async (id: number) => {
+  try {
+    const post = await prisma.post.findUnique({
+      where: { id },
+      include: {
+        author: true,
+        files: true,
+        likes: true,
+        comments: {
+          include: {
+            author: true,
+          },
+        },
+      },
+    });
+
+    if (!post) {
+      return ActionResponse.error('Post not found.', HttpStatusCode.NotFound);
+    }
+
+    return ActionResponse.success(post as unknown as PostDetailsResponse, 'Get post successfully.');
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);

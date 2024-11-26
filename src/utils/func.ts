@@ -23,3 +23,18 @@ export const getContent = (content: string, isExpanded: boolean, maxLength: numb
   const needsEllipsis = content.length > maxLength;
   return truncatedContent + (needsEllipsis ? '...' : '');
 };
+
+export const copyToClipboard = async (text: string): Promise<boolean> => {
+  if (navigator?.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (error) {
+      console.error('Failed to copy text to clipboard:', error);
+      return false;
+    }
+  } else {
+    console.error('Clipboard API is not supported in this browser.');
+    return false;
+  }
+};

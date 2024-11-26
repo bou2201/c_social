@@ -24,3 +24,16 @@ export const PostSkeleton = ({ postNumber = 1 }: { postNumber?: number }) => {
 
   return Array.from({ length: postNumber }, (_, i) => renderPostSkeleton(i));
 };
+
+export const PostDetailsSkeleton = () => {
+  return (
+    <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 border-t-csol_black/10 dark:border-t-csol_white/10 border-t-[1px]">
+      <div className="flex justify-start items-center gap-4">
+        <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+        <Skeleton className="h-4 w-28" />
+      </div>
+
+      <Skeleton className="h-16 w-full mt-4" />
+    </div>
+  );
+};

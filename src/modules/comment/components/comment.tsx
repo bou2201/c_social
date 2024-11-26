@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui';
 import { Router } from '@/constants';
 import { PostDetailsResponse } from '@/modules/post';
-import { useUser } from '@clerk/nextjs';
 import { MessageCircle } from 'lucide-react';
 import { useRouter } from 'next-nprogress-bar';
 

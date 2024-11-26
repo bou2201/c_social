@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
 import { GetPostResponse, PostDetailsResponse } from '../types/post-response.type';
 import { getContent, getShortName } from '@/utils/func';
 import dayjs from '@/lib/dayjs';
-import { Ellipsis, LinkIcon, Pencil, Trash } from 'lucide-react';
+import { Check, Ellipsis, LinkIcon, Pencil, Trash } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { DisplayDropdown, DisplayDropdownItemProps } from '@/components/display-handler';
 import { useUser } from '@clerk/nextjs';
@@ -44,6 +44,18 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
 
   const { author, content, files, createdAt, likes, id } = data;
 
+  const onCopyUrl = useCallback(async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    toast({
+      description: (
+        <div className="flex justify-center items-center gap-3">
+          <Check />
+          <span>Đã sao chép liên kết.</span>
+        </div>
+      ),
+    });
+  }, [toast]);
+
   const getOptions = useMemo(() => {
     const userOptions: DisplayDropdownItemProps[] = [
       {
@@ -56,12 +68,12 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
         icon: <Pencil className="w-4 h-4 opacity-80" />,
       },
       {
-        content: 'Gỡ bài viết',
+        content: <span className="text-csol_red">Gỡ bài viết</span>,
         key: 'delete',
         onClick: () => {
           setOpenDeletePost(true);
         },
-        icon: <Trash className="w-4 h-4 opacity-80" />,
+        icon: <Trash className="w-4 h-4 opacity-80 stroke-csol_red" />,
         isDivider: true,
       },
     ];
@@ -70,7 +82,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
       {
         content: 'Sao chép liên kết',
         key: 'copy-url',
-        onClick: () => {},
+        onClick: () => onCopyUrl(),
         icon: <LinkIcon className="w-4 h-4 opacity-80" />,
       },
     ];
@@ -80,7 +92,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
     }
 
     return commonOptions;
-  }, [data, setOpenUpdatePost, setPostSelected, user?.id]);
+  }, [data, onCopyUrl, setPostSelected, user?.id]);
 
   const { mutate: executeDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => deletePost(data.id),
@@ -170,7 +182,8 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
               dangerouslySetInnerHTML={{
                 __html: getContent(content as string, isExpanded, MAX_LENGTH_CONTENT),
               }}
-              className="text-[15px]"
+              className="text-[15px] cursor-pointer"
+              onClick={() => router.push(`${Router.ProfilePage}/${author.username}/${id}`)}
             ></div>
 
             {content && content.length > MAX_LENGTH_CONTENT && (
@@ -252,6 +265,9 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
             <div className="flex items-center mt-3">
               <Like likes={likes} postId={id} queryId={queryId} />
               <Comment author={author} postId={id} />
+              <Button variant="ghost" size="icon" className="gap-1 px-2 w-auto" onClick={onCopyUrl}>
+                <LinkIcon className={`w-[18px] h-[18px] opacity-80 flex-shrink-0`} />
+              </Button>
             </div>
           </div>
         </div>
