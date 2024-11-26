@@ -178,7 +178,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
                   setIsExpanded(!isExpanded);
                 }}
                 variant="link"
-                className="p-0 font-bold opacity-80"
+                className="p-0 font-bold opacity-80 justify-start"
               >
                 {isExpanded ? 'Thu gọn' : 'Xem thêm'}
               </Button>
@@ -195,7 +195,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
                         id={`video-player-${file.public_id}`}
                         width={250}
                         height={250}
-                        className="min-h-[270px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="min-h-[300px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
                         transformation={{
                           streaming_profile: 'hd',
                         }}
@@ -208,7 +208,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
                         key={file.public_id}
                         width={250}
                         height={250}
-                        className="h-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="h-[300px] w-auto object-cover rounded-md cursor-pointer"
                         onClick={() => setImageIndex(index)}
                         quality={100}
                         priority
@@ -248,7 +248,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
               close={() => setImageIndex(-1)}
             />
 
-            <div className="flex items-center py-3 border-b-csol_black/10 dark:border-b-csol_white/10 border-b-[1px]">
+            <div className="flex items-center py-3 gap-3 border-b-csol_black/10 dark:border-b-csol_white/10 border-b-[1px]">
               <Like likes={likes as LikePris[]} postId={id as number} queryId={postId} />
               <Comment author={author as PostDetailsResponse['author']} postId={id as number} />
               <Button variant="ghost" size="icon" className="gap-1 px-2 w-auto" onClick={onCopyUrl}>

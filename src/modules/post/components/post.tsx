@@ -209,7 +209,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
                         id={`video-player-${file.public_id}`}
                         width={250}
                         height={250}
-                        className="min-h-[270px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="min-h-[300px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
                         transformation={{
                           streaming_profile: 'hd',
                         }}
@@ -222,7 +222,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
                         key={file.public_id}
                         width={250}
                         height={250}
-                        className="h-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="h-[300px] w-auto object-cover rounded-md cursor-pointer"
                         onClick={() => setImageIndex(index)}
                         quality={100}
                         priority
@@ -262,7 +262,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
               close={() => setImageIndex(-1)}
             />
 
-            <div className="flex items-center mt-3">
+            <div className="flex items-center mt-3 gap-3">
               <Like likes={likes} postId={id} queryId={queryId} />
               <Comment author={author} postId={id} />
               <Button variant="ghost" size="icon" className="gap-1 px-2 w-auto" onClick={onCopyUrl}>

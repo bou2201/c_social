@@ -22,6 +22,8 @@ export const HomeComponent = () => {
 
   return (
     <>
+      <caption className='w-full flex justify-center font-bold opacity-80 text-sm mb-5'>Bảng tin</caption>
+
       <div className="bg-csol_white_foreground dark:bg-csol_black_foreground w-full flex flex-col sm:rounded-2xl border-csol_black/10 dark:border-csol_white/10 border-[1px]">
         {/* Top */}
         <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 flex justify-between items-center">
