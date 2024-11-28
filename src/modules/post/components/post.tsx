@@ -159,7 +159,12 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-1">
-                <b className="text-[15px] opacity-75">{author?.username}</b>
+                <b
+                  className="text-[15px] opacity-75 hover:underline"
+                  onClick={() => router.push(`${Router.ProfilePage}/${author.username}`)}
+                >
+                  {author?.username}
+                </b>
                 <span className="text-csol_black/50 dark:text-csol_white/50 text-sm font-medium">
                   • {dayjs(createdAt).fromNow(true)}
                 </span>
@@ -182,7 +187,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
               dangerouslySetInnerHTML={{
                 __html: getContent(content as string, isExpanded, MAX_LENGTH_CONTENT),
               }}
-              className="text-[15px] cursor-pointer"
+              className="text-[15px] cursor-pointer opacity-90"
               onClick={() => router.push(`${Router.ProfilePage}/${author.username}/${id}`)}
             ></div>
 
@@ -224,7 +229,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
                         height={250}
                         className="h-[300px] w-auto object-cover rounded-md cursor-pointer"
                         onClick={() => setImageIndex(index)}
-                        quality={100}
+                        unoptimized
                         priority
                       />
                     ),

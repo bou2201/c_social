@@ -38,3 +38,22 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     return false;
   }
 };
+
+export const getTitleContentMetadata = (text: string) => {
+  if (text.length <= 100) {
+    return text; // Return the full text if it's 50 characters or shorter
+  }
+
+  const trimmed = text.slice(0, 100);
+
+  // Find the last valid break point (space or newline)
+  const lastBreakIndex = Math.max(trimmed.lastIndexOf(' '), trimmed.lastIndexOf('\n'));
+
+  // If a valid break point exists, truncate to it and add ellipsis
+  if (lastBreakIndex !== -1) {
+    return trimmed.slice(0, lastBreakIndex) + '...';
+  }
+
+  // If no break point exists, return the trimmed text with ellipsis
+  return trimmed + '...';
+};

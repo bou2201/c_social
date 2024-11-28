@@ -55,7 +55,7 @@ export const ProfileComponent = ({ username }: { username: string }) => {
     queryKey: ['profile', username],
     queryFn: () => getUserByUsername(username),
   });
-  
+
   const isCurrentUser = String(profile?.data?.id) === user?.id;
 
   const PROFILE_TABS: DisplayTabsProps['tabs'] = useMemo(() => {
@@ -96,12 +96,14 @@ export const ProfileComponent = ({ username }: { username: string }) => {
       <CldUploadButton
         uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESETS}
         onSuccessAction={({ event, info }) => {
-          const newBanner = {
-            userId: profile?.data?.id as string,
-            file: info as unknown as File,
-            oldBannerId: profile?.data?.banner_id as string,
-          };
-          executeUpdateBanner(newBanner);
+          if (info) {
+            const newBanner = {
+              userId: profile?.data?.id as string,
+              file: info as unknown as File,
+              oldBannerId: profile?.data?.banner_id as string,
+            };
+            executeUpdateBanner(newBanner);
+          }
         }}
       >
         <Button
@@ -132,7 +134,9 @@ export const ProfileComponent = ({ username }: { username: string }) => {
       );
     }
 
-    return isCurrentUser ? renderUploadButton('Thêm ảnh bìa') : null;
+    return isCurrentUser ? (
+      <div className="relative h-60 w-full group">{renderUploadButton('Thêm ảnh bìa')}</div>
+    ) : null;
   };
 
   return (

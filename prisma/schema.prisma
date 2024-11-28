@@ -105,9 +105,12 @@ model Comment {
   authorId  String
   post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int
+  files     CommentFile[]
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId  Int?
+  replies   Comment[]     @relation("CommentReplies")
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-  files     CommentFile[]
 }
 
 // Trend schema

@@ -1,6 +1,7 @@
 'use client';
 
 import { getUserByUsername } from '@/actions/user.action';
+import BackToTop from '@/app/back-to-top';
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
 import { Router } from '@/constants';
 import { PostDialog, PostList, postSelectors } from '@/modules/post';
@@ -22,7 +23,9 @@ export const HomeComponent = () => {
 
   return (
     <>
-      <caption className='w-full flex justify-center font-bold opacity-80 text-sm mb-5'>Bảng tin</caption>
+      <caption className="w-full flex justify-center font-bold opacity-80 text-sm mb-5">
+        Bảng tin
+      </caption>
 
       <div className="bg-csol_white_foreground dark:bg-csol_black_foreground w-full flex flex-col sm:rounded-2xl border-csol_black/10 dark:border-csol_white/10 border-[1px]">
         {/* Top */}
@@ -59,6 +62,8 @@ export const HomeComponent = () => {
 
         <PostList id="all" />
       </div>
+
+      <BackToTop />
 
       {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
     </>

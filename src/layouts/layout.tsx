@@ -16,7 +16,6 @@ import { getUserByUsername } from '@/actions/user.action';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PopoverClose } from '@radix-ui/react-popover';
 import LoadingPage from '@/app/loading';
-import BackToTop from '@/app/back-to-top';
 
 export const AppLayout = () => {
   const [openSheet, setOpenSheet] = useState<boolean>(false);
@@ -208,8 +207,6 @@ export const AppLayout = () => {
       >
         <Plus className="w-6 h-w-6 opacity-70 " />
       </Button>
-
-      <BackToTop />
 
       {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
     </>

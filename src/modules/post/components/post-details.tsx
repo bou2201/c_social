@@ -11,10 +11,10 @@ import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { postSelectors } from '../post.store';
 import { PostDetailsResponse } from '../types/post-response.type';
-import { Check, Ellipsis, FolderSearch, LinkIcon, Pencil, Trash } from 'lucide-react';
+import { Check, Ellipsis, FolderSearch, LinkIcon, MoveLeft, Pencil, Trash } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { Like } from '@/modules/like';
-import { Comment } from '@/modules/comment';
+import { Comment, CommentForm } from '@/modules/comment';
 import { PostDetailsSkeleton } from './post.skeleton';
 import { PostDialog } from './post.dialog';
 import { PostAlertDeletePost } from './post-alert.dialog';
@@ -101,7 +101,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
         icon: <Pencil className="w-4 h-4 opacity-80" />,
       },
       {
-        content: <span className='text-csol_red'>Gỡ bài viết</span>,
+        content: <span className="text-csol_red">Gỡ bài viết</span>,
         key: 'delete',
         onClick: () => {
           setOpenDeletePost(true);
@@ -129,11 +129,30 @@ export const PostDetails = ({ postId }: { postId: string }) => {
 
   return (
     <>
+      {!isPending && (
+        <div className="relative w-full flex justify-center items-center mb-5">
+          <caption
+            className="font-bold opacity-80 text-sm hover:underline"
+            onClick={() => router.replace(`${Router.ProfilePage}/${author?.username}`)}
+          >
+            @{author?.username}
+          </caption>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute left-1 rounded-full w-8 h-8"
+            onClick={() => router.back()}
+          >
+            <MoveLeft className="w-4 h-4 opacity-70" />
+          </Button>
+        </div>
+      )}
+
       <div className="bg-csol_white_foreground dark:bg-csol_black_foreground w-full flex flex-col sm:rounded-2xl border-csol_black/10 dark:border-csol_white/10 border-[1px]">
         {isPending ? (
           <PostDetailsSkeleton />
         ) : (
-          <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 min-h-[calc(100vh_-_100px)] flex flex-col">
+          <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 min-h-[calc(100vh_-_140px)] flex flex-col relative">
             <div className="flex justify-start items-center gap-4 mb-4">
               <div className="flex flex-1 justify-start items-center gap-4">
                 <Link href={`${Router.ProfilePage}/${author?.username}`}>
@@ -256,10 +275,12 @@ export const PostDetails = ({ postId }: { postId: string }) => {
               </Button>
             </div>
 
-            <section className="flex-1 flex flex-col justify-center items-center gap-4">
+            <section className="flex-1 flex flex-col justify-center items-center gap-4 min-h-40">
               <FolderSearch className="w-16 h-16 opacity-60" />
               <span className="text-sm">Chưa có bình luận nào.</span>
             </section>
+
+            <CommentForm postDetails={postDetails?.data as PostDetailsResponse} />
           </div>
         )}
       </div>
