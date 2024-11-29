@@ -160,7 +160,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-1">
                 <b
-                  className="text-[15px] opacity-75 hover:underline"
+                  className="text-[15px] opacity-75 hover:underline cursor-pointer"
                   onClick={() => router.push(`${Router.ProfilePage}/${author.username}`)}
                 >
                   {author?.username}

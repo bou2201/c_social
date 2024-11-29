@@ -40,7 +40,7 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
 };
 
 export const getTitleContentMetadata = (text: string) => {
-  if (text.length <= 100) {
+  if (text?.length <= 100) {
     return text; // Return the full text if it's 50 characters or shorter
   }
 

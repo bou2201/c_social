@@ -142,7 +142,7 @@ export const CommentForm = ({ postDetails }: CommentFormProps) => {
                         alt={`Uploaded file`}
                         width={160}
                         height={160}
-                        crop="fill"
+                        unoptimized
                         className="object-cover rounded-md"
                       />
                     )}
