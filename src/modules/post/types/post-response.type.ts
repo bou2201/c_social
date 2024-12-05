@@ -1,20 +1,11 @@
 import { File, Like, Post, User } from '@prisma/client';
 
-export type PostDetailsResponse = Post & {
+export type PostResponse = Post & {
   author: User;
   files: File[];
   likes: Like[];
-  comments: (Comment & {
-    author: User;
-  })[];
-};
-
-export type PostMetadata = {
-  lastCursor: number | null;
-  hasMore: boolean;
-};
-
-export type GetPostResponse = {
-  data: PostDetailsResponse[];
-  metadata: PostMetadata;
+  total_comment: number;
+  // comments: (Comment & {
+  //   author: User;
+  // })[];
 };

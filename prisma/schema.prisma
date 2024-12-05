@@ -94,23 +94,23 @@ model CommentFile {
   path          String
   width         Int
   height        Int
-  comment       Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId     Int?
+  comment       Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId     Int      @unique
 }
 
 model Comment {
-  id        Int           @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   comment   String?
-  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author    User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int
-  files     CommentFile[]
-  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  file      CommentFile?
+  parent    Comment?     @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   parentId  Int?
-  replies   Comment[]     @relation("CommentReplies")
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  replies   Comment[]    @relation("CommentReplies")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
 // Trend schema

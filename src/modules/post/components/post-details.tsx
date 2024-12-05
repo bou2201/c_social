@@ -10,14 +10,14 @@ import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { postSelectors } from '../post.store';
-import { PostDetailsResponse } from '../types/post-response.type';
+import { PostResponse } from '../types/post-response.type';
 import { Check, Ellipsis, FolderSearch, LinkIcon, MoveLeft, Pencil, Trash } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { Like } from '@/modules/like';
-import { Comment, CommentForm } from '@/modules/comment';
-import { PostDetailsSkeleton } from './post.skeleton';
-import { PostDialog } from './post.dialog';
-import { PostAlertDeletePost } from './post-alert.dialog';
+import { LikeBtn } from '@/modules/like';
+import { CommentBtn, CommentForm, CommentList } from '@/modules/comment';
+import { PostDetailsSkeleton } from './post-skeleton';
+import { PostDialog } from './post-dialog';
+import { PostAlertDeletePost } from './post-alert-dialog';
 import { useToast } from '@/hooks';
 import { useRouter } from 'next-nprogress-bar';
 import dynamic from 'next/dynamic';
@@ -25,7 +25,7 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import { $Enums, Like as LikePris } from '@prisma/client';
 import { CldImage, CldVideoPlayer } from '@/components/images';
 
-const MAX_LENGTH_CONTENT = 300;
+const MAX_LENGTH_CONTENT = 400;
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
@@ -51,7 +51,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
     gcTime: 0,
   });
 
-  const { author, content, files, createdAt, likes, id } = postDetails?.data ?? {};
+  const { author, content, files, createdAt, likes, id, total_comment } = postDetails?.data ?? {};
 
   const { mutate: executeDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => deletePost(id as number),
@@ -95,7 +95,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
         content: 'Chỉnh sửa',
         key: 'update',
         onClick: () => {
-          setPostSelected(postDetails?.data as unknown as PostDetailsResponse);
+          setPostSelected(postDetails?.data as unknown as PostResponse);
           setOpenUpdatePost(true);
         },
         icon: <Pencil className="w-4 h-4 opacity-80" />,
@@ -115,7 +115,9 @@ export const PostDetails = ({ postId }: { postId: string }) => {
       {
         content: 'Sao chép liên kết',
         key: 'copy-url',
-        onClick: () => onCopyUrl(),
+        onClick: () => {
+          onCopyUrl();
+        },
         icon: <LinkIcon className="w-4 h-4 opacity-80" />,
       },
     ];
@@ -131,12 +133,12 @@ export const PostDetails = ({ postId }: { postId: string }) => {
     <>
       {!isPending && (
         <div className="relative w-full flex justify-center items-center mb-5">
-          <caption
-            className="font-bold opacity-80 text-sm hover:underline"
+          <b
+            className="opacity-80 text-sm hover:underline"
             onClick={() => router.replace(`${Router.ProfilePage}/${author?.username}`)}
           >
             @{author?.username}
-          </caption>
+          </b>
           <Button
             variant="ghost"
             size="icon"
@@ -268,19 +270,27 @@ export const PostDetails = ({ postId }: { postId: string }) => {
             />
 
             <div className="flex items-center py-3 gap-3 border-b-csol_black/10 dark:border-b-csol_white/10 border-b-[1px]">
-              <Like likes={likes as LikePris[]} postId={id as number} queryId={postId} />
-              <Comment author={author as PostDetailsResponse['author']} postId={id as number} />
+              <LikeBtn likes={likes as LikePris[]} postId={id as number} queryId={postId} />
+              <CommentBtn
+                author={author as PostResponse['author']}
+                postId={id as number}
+                totalComment={total_comment as number}
+              />
               <Button variant="ghost" size="icon" className="gap-1 px-2 w-auto" onClick={onCopyUrl}>
                 <LinkIcon className={`w-[18px] h-[18px] opacity-80 flex-shrink-0`} />
               </Button>
             </div>
 
-            <section className="flex-1 flex flex-col justify-center items-center gap-4 min-h-40">
-              <FolderSearch className="w-16 h-16 opacity-60" />
-              <span className="text-sm">Chưa có bình luận nào.</span>
-            </section>
+            {total_comment && total_comment > 0 ? (
+              <CommentList postId={id as number} key={id} />
+            ) : (
+              <section className="flex-1 flex flex-col justify-center items-center gap-4 min-h-40">
+                <FolderSearch className="w-16 h-16 opacity-60" />
+                <span className="text-sm">Chưa có bình luận nào.</span>
+              </section>
+            )}
 
-            <CommentForm postDetails={postDetails?.data as PostDetailsResponse} />
+            <CommentForm postDetails={postDetails?.data as PostResponse} />
           </div>
         )}
       </div>

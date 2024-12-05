@@ -3,18 +3,21 @@
 import { getPosts } from '@/actions/post.action';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
-import { GetPostResponse } from '../types/post-response.type';
+import { PostResponse } from '../types/post-response.type';
 import { useEffect } from 'react';
-import { Post } from './post';
-import { PostSkeleton } from './post.skeleton';
+import { PostItem } from './post-item';
+import { PostSkeleton } from './post-skeleton';
 import { useToast } from '@/hooks';
 
 export const PostList = ({ id = 'all' }: { id: string }) => {
   const { toast } = useToast();
   const { ref, inView } = useInView();
 
+  const checkLastViewRef = (index: number, page: Common.PagingRes<PostResponse>) =>
+    index === page.data.length - 1;
+
   const { data, error, isLoading, hasNextPage, fetchNextPage, isSuccess, isFetchingNextPage } =
-    useInfiniteQuery<GetPostResponse, Error>({
+    useInfiniteQuery<Common.PagingRes<PostResponse>, Error>({
       queryKey: ['posts', id],
       queryFn: (({ pageParam }: { pageParam: unknown }) => getPosts(Number(pageParam), id)) as any,
       initialPageParam: 0,
@@ -26,8 +29,6 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
       fetchNextPage();
     }
   }, [fetchNextPage, hasNextPage, inView]);
-
-  const checkLastViewRef = (index: number, page: GetPostResponse) => index === page.data.length - 1;
 
   if (error) {
     toast({
@@ -49,11 +50,11 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
           page?.data?.map((post, index) =>
             checkLastViewRef(index, page) ? (
               <div ref={ref} key={post.id}>
-                <Post data={post} queryId={id} />
+                <PostItem data={post} queryId={id} />
               </div>
             ) : (
               <div key={post.id}>
-                <Post data={post} queryId={id} />
+                <PostItem data={post} queryId={id} />
               </div>
             ),
           ),

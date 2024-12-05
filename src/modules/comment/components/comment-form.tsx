@@ -1,13 +1,17 @@
 'use client';
 
+import { createComment } from '@/actions/comment.action';
 import { DisplayTooltip } from '@/components/display-handler';
 import { InputTextArea } from '@/components/form-handler';
 import { CldImage, CldVideoPlayer } from '@/components/images';
-import { Avatar, AvatarImage, Button, Form } from '@/components/ui';
+import { Button, Form } from '@/components/ui';
 import { Message } from '@/constants';
-import { PostDetailsResponse } from '@/modules/post';
+import { useToast } from '@/hooks';
+import { PostResponse } from '@/modules/post';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { $Enums, File } from '@prisma/client';
+import { CornerTopLeftIcon } from '@radix-ui/react-icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Images, SendHorizontal, X } from 'lucide-react';
 import { CldUploadButton, CloudinaryUploadWidgetInfo } from 'next-cloudinary';
 import { useEffect, useRef, useState } from 'react';
@@ -15,10 +19,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const commentFormSchema = z.object({
-  content: z
-    .string({ message: Message.required })
-    .min(1, Message.required)
-    .max(3000, 'Tối đa 3000 ký tự.'),
+  content: z.string().max(3000, 'Tối đa 3000 ký tự.').optional(),
   file: z
     .object({
       id: z.string(),
@@ -40,14 +41,39 @@ const commentFormSchema = z.object({
 export type CommentFormSchemaType = z.infer<typeof commentFormSchema>;
 
 type CommentFormProps = {
-  postDetails: PostDetailsResponse;
+  postDetails: PostResponse;
 };
 
 export const CommentForm = ({ postDetails }: CommentFormProps) => {
   const [focusInput, setFocusInput] = useState<boolean>(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { author } = postDetails;
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { author, id } = postDetails;
+
+  const { mutate: execute, isPending } = useMutation({
+    mutationFn: (data: CommentFormSchemaType) => createComment(id, data),
+    onSuccess: () => {
+      toast({
+        title: 'Bình luận thành công',
+        description: `Bạn vừa bình luận bài viết của @${author.banner_id}`,
+      });
+
+      form.reset();
+      setFocusInput(false);
+
+      queryClient.invalidateQueries({ queryKey: ['comments', id] });
+    },
+    onError: (error, variables, context) => {
+      console.log('🚀 ~ CommentForm ~ error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Bình luận thất bại',
+        description: 'Có lỗi xảy ra, vui lòng thử lại sau.',
+      });
+    },
+  });
 
   const form = useForm<CommentFormSchemaType>({
     resolver: zodResolver(commentFormSchema),
@@ -93,22 +119,21 @@ export const CommentForm = ({ postDetails }: CommentFormProps) => {
       }
     };
 
-    // Add event listener for clicks
     document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
-      // Cleanup the event listener on unmount
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((data) => {})} ref={formRef} className="sticky bottom-6">
+      <form
+        onSubmit={form.handleSubmit((data) => execute(data))}
+        ref={formRef}
+        className="sticky bottom-2"
+      >
         <div className="flex flex-1 justify-start items-start gap-3">
-          <Avatar>
-            <AvatarImage src={author?.image_url ?? ''} className="object-cover" />
-          </Avatar>
           <div className="flex-1 bg-csol_white dark:bg-csol_black py-2 px-4 rounded-xl">
             <InputTextArea<CommentFormSchemaType>
               name="content"
@@ -174,23 +199,26 @@ export const CommentForm = ({ postDetails }: CommentFormProps) => {
                         variant="ghost"
                         size="icon"
                         type="button"
-                        className="w-5 h-5 opacity-50"
+                        className="opacity-50"
                         onClick={(e) => e.preventDefault()}
                       >
-                        <Images />
+                        <Images className="w-5 h-5" />
                       </Button>
                     </DisplayTooltip>
                   </CldUploadButton>
 
                   <Button
-                    variant="ghost"
+                    variant="default"
                     size="icon"
                     type="submit"
-                    className="w-5 h-5 opacity-80"
-                    onClick={(e) => e.preventDefault()}
-                    disabled={!form.formState.isDirty}
+                    className="opacity-80 rounded-full"
+                    disabled={!form.formState.isDirty || isPending}
                   >
-                    <SendHorizontal />
+                    {isPending ? (
+                      <CornerTopLeftIcon className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <SendHorizontal className="w-5 h-5" />
+                    )}
                   </Button>
                 </div>
               </>

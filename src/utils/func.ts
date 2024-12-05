@@ -57,3 +57,18 @@ export const getTitleContentMetadata = (text: string) => {
   // If no break point exists, return the trimmed text with ellipsis
   return trimmed + '...';
 };
+
+export const getNumberFormat = (num: number): string => {
+  if (num < 1000) return num.toString(); // Return the number as-is if less than 1000
+
+  const thousands = Math.floor(num / 1000); // Extract the thousands part
+  const remainder = num % 1000; // Calculate the remainder
+
+  if (remainder === 0) {
+    return `${thousands}k`; // If there is no remainder, simply append 'k'
+  }
+
+  const decimals = Math.floor((remainder / 1000) * 100); // Calculate two decimal points
+
+  return `${thousands},${decimals}k`;
+};

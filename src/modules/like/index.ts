@@ -1,1 +1,1 @@
-export * from './components/like';
+export * from './components/like-btn';

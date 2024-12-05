@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
-import { GetPostResponse, PostDetailsResponse } from '../types/post-response.type';
+import { PostResponse } from '../types/post-response.type';
 import { getContent, getShortName } from '@/utils/func';
 import dayjs from '@/lib/dayjs';
 import { Check, Ellipsis, LinkIcon, Pencil, Trash } from 'lucide-react';
@@ -10,15 +10,15 @@ import dynamic from 'next/dynamic';
 import { DisplayDropdown, DisplayDropdownItemProps } from '@/components/display-handler';
 import { useUser } from '@clerk/nextjs';
 import { postSelectors } from '../post.store';
-import { PostDialog } from './post.dialog';
-import { PostAlertDeletePost } from './post-alert.dialog';
+import { PostDialog } from './post-dialog';
+import { PostAlertDeletePost } from './post-alert-dialog';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePost } from '@/actions/post.action';
 import { useToast } from '@/hooks';
 import { CldImage, CldVideoPlayer } from '@/components/images';
 import ScrollContainer from 'react-indiana-drag-scroll';
-import { Like } from '@/modules/like';
-import { Comment } from '@/modules/comment';
+import { LikeBtn } from '@/modules/like';
+import { CommentBtn } from '@/modules/comment';
 import { $Enums } from '@prisma/client';
 import Link from 'next/link';
 import { Router } from '@/constants';
@@ -26,9 +26,9 @@ import { useRouter } from 'next-nprogress-bar';
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
-const MAX_LENGTH_CONTENT = 300;
+const MAX_LENGTH_CONTENT = 400;
 
-export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: string }) => {
+export const PostItem = ({ data, queryId }: { data: PostResponse; queryId: string }) => {
   const [imageIndex, setImageIndex] = useState<number>(-1);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
@@ -42,7 +42,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
 
   const setPostSelected = postSelectors.setPostSelected();
 
-  const { author, content, files, createdAt, likes, id } = data;
+  const { author, content, files, createdAt, likes, id, total_comment } = data;
 
   const onCopyUrl = useCallback(async () => {
     await navigator.clipboard.writeText(window.location.href);
@@ -82,7 +82,9 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
       {
         content: 'Sao chép liên kết',
         key: 'copy-url',
-        onClick: () => onCopyUrl(),
+        onClick: () => {
+          onCopyUrl();
+        },
         icon: <LinkIcon className="w-4 h-4 opacity-80" />,
       },
     ];
@@ -106,7 +108,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
       // Optimistically update the cache to remove the deleted post
       queryClient.setQueryData(
         ['posts', queryId],
-        (oldData: InfiniteData<GetPostResponse, unknown>) => {
+        (oldData: InfiniteData<Common.PagingRes<PostResponse>, unknown>) => {
           if (!oldData) return oldData;
 
           return {
@@ -268,8 +270,8 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
             />
 
             <div className="flex items-center mt-3 gap-3">
-              <Like likes={likes} postId={id} queryId={queryId} />
-              <Comment author={author} postId={id} />
+              <LikeBtn likes={likes} postId={id} queryId={queryId} />
+              <CommentBtn author={author} postId={id} totalComment={total_comment} />
               <Button variant="ghost" size="icon" className="gap-1 px-2 w-auto" onClick={onCopyUrl}>
                 <LinkIcon className={`w-[18px] h-[18px] opacity-80 flex-shrink-0`} />
               </Button>

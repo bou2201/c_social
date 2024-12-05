@@ -1,5 +1,5 @@
 import { likePost, unlikePost } from '@/actions/like.action';
-import { GetPostResponse, PostDetailsResponse } from '@/modules/post';
+import { PostResponse } from '@/modules/post';
 import { useUser } from '@clerk/nextjs';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -24,7 +24,7 @@ export const useToggleLikePost = (queryId: string) => {
       // Optimistically update the cache to remove the deleted post
       queryClient.setQueryData(
         ['posts', queryId],
-        (oldData: InfiniteData<GetPostResponse, unknown>) => {
+        (oldData: InfiniteData<Common.PagingRes<PostResponse>, unknown>) => {
           if (!oldData) return oldData;
 
           return {
@@ -82,7 +82,7 @@ export const useToggleLikePostDetails = (queryId: string) => {
       const previousPosts = queryClient.getQueryData(['posts', queryId]);
 
       // Optimistically update the details cache
-      queryClient.setQueryData(['post', postId], (oldPost: PostDetailsResponse) => {
+      queryClient.setQueryData(['post', postId], (oldPost: PostResponse) => {
         if (!oldPost) return oldPost;
         return {
           ...oldPost,
@@ -95,7 +95,7 @@ export const useToggleLikePostDetails = (queryId: string) => {
       // Optimistically update the cache to remove the deleted post
       queryClient.setQueryData(
         ['posts', queryId],
-        (oldData: InfiniteData<GetPostResponse, unknown>) => {
+        (oldData: InfiniteData<Common.PagingRes<PostResponse>, unknown>) => {
           if (!oldData) return oldData;
 
           return {

@@ -6,14 +6,15 @@ import { useState } from 'react';
 import { Button } from '@/components/ui';
 import { Heart } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { getNumberFormat } from '@/utils/func';
 
-type LikeProps = {
+type LikeBtnProps = {
   queryId: string;
   likes: LikePris[];
   postId: number;
 };
 
-export const Like = ({ queryId, likes, postId }: LikeProps) => {
+export const LikeBtn = ({ queryId, likes, postId }: LikeBtnProps) => {
   const [isBouncing, setIsBouncing] = useState<boolean>(false);
 
   const { mutate: mutateLikePost } = useToggleLikePost(queryId);
@@ -53,7 +54,7 @@ export const Like = ({ queryId, likes, postId }: LikeProps) => {
           isLiked ? 'fill-csol_red stroke-csol_red' : 'opacity-80'
         } ${isBouncing ? 'animate-bounce' : ''}`}
       />
-      {likes?.length > 0 && <span className="opacity-70">{likes?.length}</span>}
+      {likes?.length > 0 && <span className="opacity-70">{getNumberFormat(likes?.length)}</span>}
     </Button>
   );
 };
