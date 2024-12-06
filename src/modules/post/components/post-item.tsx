@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage, Button } from '@/components/ui';
-import { GetPostResponse, PostDetailsResponse } from '../types/post-response.type';
+import { PostResponse } from '../types/post-response.type';
 import { getContent, getShortName } from '@/utils/func';
 import dayjs from '@/lib/dayjs';
 import { Check, Ellipsis, LinkIcon, Pencil, Trash } from 'lucide-react';
@@ -10,15 +10,15 @@ import dynamic from 'next/dynamic';
 import { DisplayDropdown, DisplayDropdownItemProps } from '@/components/display-handler';
 import { useUser } from '@clerk/nextjs';
 import { postSelectors } from '../post.store';
-import { PostDialog } from './post.dialog';
-import { PostAlertDeletePost } from './post-alert.dialog';
+import { PostDialog } from './post-dialog';
+import { PostAlertDeletePost } from './post-alert-dialog';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePost } from '@/actions/post.action';
 import { useToast } from '@/hooks';
 import { CldImage, CldVideoPlayer } from '@/components/images';
 import ScrollContainer from 'react-indiana-drag-scroll';
-import { Like } from '@/modules/like';
-import { Comment } from '@/modules/comment';
+import { LikeBtn } from '@/modules/like';
+import { CommentBtn } from '@/modules/comment';
 import { $Enums } from '@prisma/client';
 import Link from 'next/link';
 import { Router } from '@/constants';
@@ -26,9 +26,15 @@ import { useRouter } from 'next-nprogress-bar';
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
-const MAX_LENGTH_CONTENT = 300;
+const MAX_LENGTH_CONTENT = 400;
 
-export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: string }) => {
+type PostItemProps = {
+  data: PostResponse;
+  queryId: string;
+  index: number;
+};
+
+export const PostItem = ({ data, queryId, index }: PostItemProps) => {
   const [imageIndex, setImageIndex] = useState<number>(-1);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
@@ -42,10 +48,10 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
 
   const setPostSelected = postSelectors.setPostSelected();
 
-  const { author, content, files, createdAt, likes, id } = data;
+  const { author, content, files, createdAt, likes, id, total_comment } = data;
 
   const onCopyUrl = useCallback(async () => {
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(`${window.location.href}/${author.username}/${id}`);
     toast({
       description: (
         <div className="flex justify-center items-center gap-3">
@@ -54,7 +60,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
         </div>
       ),
     });
-  }, [toast]);
+  }, [author.username, id, toast]);
 
   const getOptions = useMemo(() => {
     const userOptions: DisplayDropdownItemProps[] = [
@@ -82,7 +88,9 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
       {
         content: 'Sao chép liên kết',
         key: 'copy-url',
-        onClick: () => onCopyUrl(),
+        onClick: () => {
+          onCopyUrl();
+        },
         icon: <LinkIcon className="w-4 h-4 opacity-80" />,
       },
     ];
@@ -106,7 +114,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
       // Optimistically update the cache to remove the deleted post
       queryClient.setQueryData(
         ['posts', queryId],
-        (oldData: InfiniteData<GetPostResponse, unknown>) => {
+        (oldData: InfiniteData<Common.PagingRes<PostResponse>, unknown>) => {
           if (!oldData) return oldData;
 
           return {
@@ -146,7 +154,13 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
 
   return (
     <>
-      <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 border-t-csol_black/10 dark:border-t-csol_white/10 border-t-[1px]">
+      <div
+        className={`max-sm:py-4 py-5 max-sm:px-4 px-6 ${
+          user && index !== 0
+            ? 'border-t-csol_black/10 dark:border-t-csol_white/10 border-t-[1px]'
+            : ''
+        }`}
+      >
         <div className="flex justify-start items-start gap-4">
           <Link href={`${Router.ProfilePage}/${author.username}`}>
             <Avatar className="h-10 w-10 flex-shrink-0">
@@ -159,7 +173,12 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-1">
-                <b className="text-[15px] opacity-75">{author?.username}</b>
+                <b
+                  className="text-[15px] opacity-75 hover:underline cursor-pointer"
+                  onClick={() => router.push(`${Router.ProfilePage}/${author.username}`)}
+                >
+                  {author?.username}
+                </b>
                 <span className="text-csol_black/50 dark:text-csol_white/50 text-sm font-medium">
                   • {dayjs(createdAt).fromNow(true)}
                 </span>
@@ -182,7 +201,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
               dangerouslySetInnerHTML={{
                 __html: getContent(content as string, isExpanded, MAX_LENGTH_CONTENT),
               }}
-              className="text-[15px] cursor-pointer"
+              className="text-[15px] cursor-pointer opacity-90"
               onClick={() => router.push(`${Router.ProfilePage}/${author.username}/${id}`)}
             ></div>
 
@@ -209,7 +228,7 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
                         id={`video-player-${file.public_id}`}
                         width={250}
                         height={250}
-                        className="min-h-[270px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="min-h-[300px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
                         transformation={{
                           streaming_profile: 'hd',
                         }}
@@ -222,9 +241,9 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
                         key={file.public_id}
                         width={250}
                         height={250}
-                        className="h-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="h-[300px] w-auto object-cover rounded-md cursor-pointer"
                         onClick={() => setImageIndex(index)}
-                        quality={100}
+                        unoptimized
                         priority
                       />
                     ),
@@ -262,9 +281,9 @@ export const Post = ({ data, queryId }: { data: PostDetailsResponse; queryId: st
               close={() => setImageIndex(-1)}
             />
 
-            <div className="flex items-center mt-3">
-              <Like likes={likes} postId={id} queryId={queryId} />
-              <Comment author={author} postId={id} />
+            <div className="flex items-center mt-3 gap-3">
+              <LikeBtn likes={likes} postId={id} queryId={queryId} />
+              <CommentBtn author={author} postId={id} totalComment={total_comment} />
               <Button variant="ghost" size="icon" className="gap-1 px-2 w-auto" onClick={onCopyUrl}>
                 <LinkIcon className={`w-[18px] h-[18px] opacity-80 flex-shrink-0`} />
               </Button>

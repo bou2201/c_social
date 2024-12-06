@@ -15,7 +15,7 @@ import { CldUploadButton, CldVideoPlayer, CloudinaryUploadWidgetInfo } from 'nex
 import { $Enums, File } from '@prisma/client';
 import { CldImage } from '@/components/images';
 import { deleteFile, deleteFiles } from '@/actions/upload.action';
-import { PostAlertDialog } from './post-alert.dialog';
+import { PostAlertDialog } from './post-alert-dialog';
 import { useToast } from '@/hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPost, updatePost } from '@/actions/post.action';

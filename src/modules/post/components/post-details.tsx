@@ -10,14 +10,14 @@ import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 import { postSelectors } from '../post.store';
-import { PostDetailsResponse } from '../types/post-response.type';
-import { Check, Ellipsis, FolderSearch, LinkIcon, Pencil, Trash } from 'lucide-react';
+import { PostResponse } from '../types/post-response.type';
+import { Check, Ellipsis, FolderSearch, LinkIcon, MoveLeft, Pencil, Trash } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { Like } from '@/modules/like';
-import { Comment } from '@/modules/comment';
-import { PostDetailsSkeleton } from './post.skeleton';
-import { PostDialog } from './post.dialog';
-import { PostAlertDeletePost } from './post-alert.dialog';
+import { LikeBtn } from '@/modules/like';
+import { CommentBtn, CommentForm, CommentList } from '@/modules/comment';
+import { PostDetailsSkeleton } from './post-skeleton';
+import { PostDialog } from './post-dialog';
+import { PostAlertDeletePost } from './post-alert-dialog';
 import { useToast } from '@/hooks';
 import { useRouter } from 'next-nprogress-bar';
 import dynamic from 'next/dynamic';
@@ -25,7 +25,7 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import { $Enums, Like as LikePris } from '@prisma/client';
 import { CldImage, CldVideoPlayer } from '@/components/images';
 
-const MAX_LENGTH_CONTENT = 300;
+const MAX_LENGTH_CONTENT = 400;
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
@@ -51,7 +51,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
     gcTime: 0,
   });
 
-  const { author, content, files, createdAt, likes, id } = postDetails?.data ?? {};
+  const { author, content, files, createdAt, likes, id, total_comment } = postDetails?.data ?? {};
 
   const { mutate: executeDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => deletePost(id as number),
@@ -95,13 +95,13 @@ export const PostDetails = ({ postId }: { postId: string }) => {
         content: 'Chỉnh sửa',
         key: 'update',
         onClick: () => {
-          setPostSelected(postDetails?.data as unknown as PostDetailsResponse);
+          setPostSelected(postDetails?.data as unknown as PostResponse);
           setOpenUpdatePost(true);
         },
         icon: <Pencil className="w-4 h-4 opacity-80" />,
       },
       {
-        content: <span className='text-csol_red'>Gỡ bài viết</span>,
+        content: <span className="text-csol_red">Gỡ bài viết</span>,
         key: 'delete',
         onClick: () => {
           setOpenDeletePost(true);
@@ -115,7 +115,9 @@ export const PostDetails = ({ postId }: { postId: string }) => {
       {
         content: 'Sao chép liên kết',
         key: 'copy-url',
-        onClick: () => onCopyUrl(),
+        onClick: () => {
+          onCopyUrl();
+        },
         icon: <LinkIcon className="w-4 h-4 opacity-80" />,
       },
     ];
@@ -129,11 +131,30 @@ export const PostDetails = ({ postId }: { postId: string }) => {
 
   return (
     <>
+      {!isPending && (
+        <div className="relative w-full flex justify-center items-center mb-5">
+          <b
+            className="opacity-80 text-sm hover:underline"
+            onClick={() => router.replace(`${Router.ProfilePage}/${author?.username}`)}
+          >
+            @{author?.username}
+          </b>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute left-4 rounded-full w-8 h-8"
+            onClick={() => router.back()}
+          >
+            <MoveLeft className="w-4 h-4 opacity-70" />
+          </Button>
+        </div>
+      )}
+
       <div className="bg-csol_white_foreground dark:bg-csol_black_foreground w-full flex flex-col sm:rounded-2xl border-csol_black/10 dark:border-csol_white/10 border-[1px]">
         {isPending ? (
           <PostDetailsSkeleton />
         ) : (
-          <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 min-h-[calc(100vh_-_100px)] flex flex-col">
+          <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 min-h-[calc(100vh_-_140px)] flex flex-col relative">
             <div className="flex justify-start items-center gap-4 mb-4">
               <div className="flex flex-1 justify-start items-center gap-4">
                 <Link href={`${Router.ProfilePage}/${author?.username}`}>
@@ -178,7 +199,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
                   setIsExpanded(!isExpanded);
                 }}
                 variant="link"
-                className="p-0 font-bold opacity-80"
+                className="p-0 font-bold opacity-80 justify-start"
               >
                 {isExpanded ? 'Thu gọn' : 'Xem thêm'}
               </Button>
@@ -195,7 +216,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
                         id={`video-player-${file.public_id}`}
                         width={250}
                         height={250}
-                        className="min-h-[270px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="min-h-[300px] min-w-[270px] w-auto object-cover rounded-md cursor-pointer"
                         transformation={{
                           streaming_profile: 'hd',
                         }}
@@ -208,7 +229,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
                         key={file.public_id}
                         width={250}
                         height={250}
-                        className="h-[270px] w-auto object-cover rounded-md cursor-pointer"
+                        className="h-[300px] w-auto object-cover rounded-md cursor-pointer"
                         onClick={() => setImageIndex(index)}
                         quality={100}
                         priority
@@ -248,18 +269,28 @@ export const PostDetails = ({ postId }: { postId: string }) => {
               close={() => setImageIndex(-1)}
             />
 
-            <div className="flex items-center py-3 border-b-csol_black/10 dark:border-b-csol_white/10 border-b-[1px]">
-              <Like likes={likes as LikePris[]} postId={id as number} queryId={postId} />
-              <Comment author={author as PostDetailsResponse['author']} postId={id as number} />
+            <div className="flex items-center py-3 gap-3 border-b-csol_black/10 dark:border-b-csol_white/10 border-b-[1px]">
+              <LikeBtn likes={likes as LikePris[]} postId={id as number} queryId={postId} />
+              <CommentBtn
+                author={author as PostResponse['author']}
+                postId={id as number}
+                totalComment={total_comment as number}
+              />
               <Button variant="ghost" size="icon" className="gap-1 px-2 w-auto" onClick={onCopyUrl}>
                 <LinkIcon className={`w-[18px] h-[18px] opacity-80 flex-shrink-0`} />
               </Button>
             </div>
 
-            <section className="flex-1 flex flex-col justify-center items-center gap-4">
-              <FolderSearch className="w-16 h-16 opacity-60" />
-              <span className="text-sm">Chưa có bình luận nào.</span>
-            </section>
+            {total_comment && total_comment > 0 ? (
+              <CommentList postId={id as number} key={id} />
+            ) : (
+              <section className="flex-1 flex flex-col justify-center items-center gap-4 min-h-40">
+                <FolderSearch className="w-16 h-16 opacity-60" />
+                <span className="text-sm">Chưa có bình luận nào.</span>
+              </section>
+            )}
+
+            {user && <CommentForm postDetails={postDetails?.data as PostResponse} />}
           </div>
         )}
       </div>

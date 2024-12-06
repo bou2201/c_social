@@ -1,15 +1,18 @@
 import { Button } from '@/components/ui';
 import { Router } from '@/constants';
-import { PostDetailsResponse } from '@/modules/post';
+import { PostResponse } from '@/modules/post';
+import { getNumberFormat } from '@/utils/func';
 import { MessageCircle } from 'lucide-react';
 import { useRouter } from 'next-nprogress-bar';
+import { memo } from 'react';
 
-type CommentProps = {
-  author: PostDetailsResponse['author'];
+type CommentBtnProps = {
+  author: PostResponse['author'];
   postId: number;
+  totalComment: number;
 };
 
-export const Comment = ({ author, postId }: CommentProps) => {
+export const CommentBtn = memo(({ author, postId, totalComment }: CommentBtnProps) => {
   const router = useRouter();
 
   return (
@@ -20,6 +23,9 @@ export const Comment = ({ author, postId }: CommentProps) => {
       onClick={() => router.push(`${Router.ProfilePage}/${author.username}/${postId}`)}
     >
       <MessageCircle className={`w-[18px] h-[18px] opacity-80 flex-shrink-0`} />
+      {totalComment > 0 && <span className="opacity-70">{getNumberFormat(totalComment)}</span>}
     </Button>
   );
-};
+});
+
+CommentBtn.displayName = CommentBtn.name;

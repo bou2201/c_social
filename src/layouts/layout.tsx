@@ -16,15 +16,18 @@ import { getUserByUsername } from '@/actions/user.action';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PopoverClose } from '@radix-ui/react-popover';
 import LoadingPage from '@/app/loading';
-import BackToTop from '@/app/back-to-top';
+import { useRouter } from 'next-nprogress-bar';
+import DrawerAlertAuth from '@/app/drawer-alert-auth';
 
 export const AppLayout = () => {
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [openPopoverAvt, setOpenPopoverAvt] = useState<boolean>(false);
+  const [openAlertAuth, setOpenAlertAuth] = useState<boolean>(false);
 
   const { signOut } = useClerk();
   const { user } = useUser();
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
 
   const openPostDialog = postSelectors.isOpen();
   const setOpenPostDialog = postSelectors.setIsOpen();
@@ -53,20 +56,40 @@ export const AppLayout = () => {
       {
         icon: <Plus className="w-6 h-6 opacity-70" />,
         label: 'Tạo',
-        onClick: () => setOpenPostDialog(true),
+        onClick: () => {
+          if (user) {
+            setOpenPostDialog(true);
+          } else {
+            setOpenAlertAuth(true);
+          }
+        },
       },
       {
         icon: <Heart className="w-6 h-6 opacity-70" />,
-        slug: Router.Notifications,
+        // slug: Router.Notifications,
         label: 'Thông báo',
+        onClick: () => {
+          if (user) {
+            router.push(Router.Notifications);
+          } else {
+            setOpenAlertAuth(true);
+          }
+        },
       },
       {
         icon: <UserRound className="w-6 h-6 opacity-70" />,
-        slug: Router.ProfilePage + '/' + user?.username,
+        // slug: Router.ProfilePage + '/' + user?.username,
         label: 'Trang cá nhân',
+        onClick: () => {
+          if (user) {
+            router.push(Router.ProfilePage + '/' + user?.username);
+          } else {
+            setOpenAlertAuth(true);
+          }
+        },
       },
     ];
-  }, [setOpenPostDialog, user?.username]);
+  }, [router, setOpenPostDialog, user]);
 
   const HEADER_NAVIGATION_RESP: Omit<NavLinkProps, 'onClick'>[] = useMemo(() => {
     return [
@@ -82,16 +105,30 @@ export const AppLayout = () => {
       },
       {
         icon: <Heart className="w-6 h-6 mr-2 opacity-70" />,
-        slug: Router.Notifications,
+        // slug: Router.Notifications,
         label: 'Thông báo',
+        onClick: () => {
+          if (user) {
+            router.push(Router.Notifications);
+          } else {
+            setOpenAlertAuth(true);
+          }
+        },
       },
       {
         icon: <UserRound className="w-6 h-6 mr-2 opacity-70" />,
-        slug: Router.ProfilePage + '/' + user?.username,
+        // slug: Router.ProfilePage + '/' + user?.username,
         label: 'Trang cá nhân',
+        onClick: () => {
+          if (user) {
+            router.push(Router.ProfilePage + '/' + user?.username);
+          } else {
+            setOpenAlertAuth(true);
+          }
+        },
       },
     ];
-  }, [user?.username]);
+  }, [router, user]);
 
   const renderAvatarButton = useCallback(() => {
     return (
@@ -160,58 +197,71 @@ export const AppLayout = () => {
             {theme === 'dark' ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
           </Button>
 
-          <DisplayPopover
-            open={openPopoverAvt}
-            setOpen={setOpenPopoverAvt}
-            trigger={renderAvatarButton()}
-            className="w-72"
-          >
-            <div className="flex gap-4">
-              <Avatar className="h-10 w-10 flex-shrink-0">
-                <AvatarImage src={profile?.data?.image_url ?? ''} className="object-cover" />
-                <AvatarFallback>
-                  {getShortName(`${user?.firstName} ${user?.lastName}`)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-semibold">
-                  {`${profile?.data?.first_name ?? '...'} ${profile?.data?.last_name}`}
-                </p>
-                <span className="opacity-70 text-sm">@{profile?.data?.username}</span>
-              </div>
-            </div>
-
-            <Separator className="mt-4 mb-2" />
-
-            <Link href={Router.ProfilePage + '/' + user?.username}>
-              <PopoverClose asChild>
-                <Button className="opacity-80 w-full !gap-5 justify-start mb-1" variant="ghost">
-                  <UserRound className="w-4 h-4" /> Trang cá nhân
-                </Button>
-              </PopoverClose>
-            </Link>
-            <Button
-              className="opacity-80 w-full !gap-5 justify-start"
-              variant="ghost"
-              onClick={() => executeLogout()}
+          {user ? (
+            <DisplayPopover
+              open={openPopoverAvt}
+              setOpen={setOpenPopoverAvt}
+              trigger={renderAvatarButton()}
+              className="w-72"
             >
-              <LogOut className="w-4 h-4" /> Đăng xuất
+              <div className="flex gap-4">
+                <Avatar className="h-10 w-10 flex-shrink-0">
+                  <AvatarImage src={profile?.data?.image_url ?? ''} className="object-cover" />
+                  <AvatarFallback>
+                    {getShortName(`${user?.firstName} ${user?.lastName}`)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-semibold">
+                    {`${profile?.data?.first_name ?? '...'} ${profile?.data?.last_name}`}
+                  </p>
+                  <span className="opacity-70 text-sm">@{profile?.data?.username}</span>
+                </div>
+              </div>
+
+              <Separator className="mt-4 mb-2" />
+
+              <Link href={Router.ProfilePage + '/' + user?.username}>
+                <PopoverClose asChild>
+                  <Button className="opacity-80 w-full !gap-5 justify-start mb-1" variant="ghost">
+                    <UserRound className="w-4 h-4" /> Trang cá nhân
+                  </Button>
+                </PopoverClose>
+              </Link>
+              <Button
+                className="opacity-80 w-full !gap-5 justify-start"
+                variant="ghost"
+                onClick={() => executeLogout()}
+              >
+                <LogOut className="w-4 h-4" /> Đăng xuất
+              </Button>
+            </DisplayPopover>
+          ) : (
+            <Button
+              variant="default"
+              className="font-semibold"
+              onClick={() => router.push(Router.SignIn)}
+            >
+              Đăng nhập
             </Button>
-          </DisplayPopover>
+          )}
         </div>
       </header>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setOpenPostDialog(true)}
-        className="w-12 h-12 fixed max-md:hidden bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground hover:scale-125 transform-gpu"
-      >
-        <Plus className="w-6 h-w-6 opacity-70 " />
-      </Button>
 
-      <BackToTop />
+      {user && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpenPostDialog(true)}
+          className="w-12 h-12 fixed max-md:hidden bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground hover:scale-125 transform-gpu"
+        >
+          <Plus className="w-6 h-w-6 opacity-70 " />
+        </Button>
+      )}
 
       {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
+
+      <DrawerAlertAuth open={openAlertAuth} setOpen={setOpenAlertAuth} />
     </>
   );
 };

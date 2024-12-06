@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { PostFormSchemaType, PostDetailsResponse } from '@/modules/post';
+import { PostFormSchemaType, PostResponse } from '@/modules/post';
 import { ActionResponse } from '@/utils/action';
 import { currentUser } from '@clerk/nextjs/server';
 import { HttpStatusCode } from 'axios';
@@ -207,11 +207,16 @@ export const getPosts = async (lastCursor?: number | null, id: string = 'all') =
         author: true,
         files: true,
         likes: true,
-        comments: {
-          include: {
-            author: true,
+        _count: {
+          select: {
+            comments: true,
           },
         },
+        // comments: {
+        //   include: {
+        //     author: true,
+        //   },
+        // },
       },
       where,
       take,
@@ -246,8 +251,13 @@ export const getPosts = async (lastCursor?: number | null, id: string = 'all') =
       cursor: { id: cursor },
     });
 
+    const transformedPosts = posts.map((post) => ({
+      ...post,
+      total_comment: post._count?.comments ?? 0,
+    }));
+
     return {
-      data: posts as unknown as PostDetailsResponse[],
+      data: transformedPosts as unknown as PostResponse[],
       metadata: {
         lastCursor: cursor,
         hasMore: morePosts.length > 0,
@@ -268,11 +278,16 @@ export const getPost = async (id: number) => {
         author: true,
         files: true,
         likes: true,
-        comments: {
-          include: {
-            author: true,
+        _count: {
+          select: {
+            comments: true,
           },
         },
+        // comments: {
+        //   include: {
+        //     author: true,
+        //   },
+        // },
       },
     });
 
@@ -280,7 +295,10 @@ export const getPost = async (id: number) => {
       return ActionResponse.error('Post not found.', HttpStatusCode.NotFound);
     }
 
-    return ActionResponse.success(post as unknown as PostDetailsResponse, 'Get post successfully.');
+    return ActionResponse.success(
+      { ...post, total_comment: post._count.comments } as unknown as PostResponse,
+      'Get post successfully.',
+    );
   } catch (error) {
     if (error instanceof Error) {
       return ActionResponse.error(error.message, HttpStatusCode.InternalServerError);

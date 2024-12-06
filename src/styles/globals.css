@@ -80,6 +80,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground min-h-screen overflow-x-hidden;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
 }

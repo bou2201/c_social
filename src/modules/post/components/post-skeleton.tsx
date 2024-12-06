@@ -33,7 +33,33 @@ export const PostDetailsSkeleton = () => {
         <Skeleton className="h-4 w-28" />
       </div>
 
-      <Skeleton className="h-16 w-full mt-4" />
+      <Skeleton className="h-20 w-full mt-4" />
+
+      <Skeleton className="h-1 w-full my-6" />
+
+      <div className="flex justify-start items-start gap-4 mb-4">
+        <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+        <div className="w-full">
+          <Skeleton className="h-4 w-28 mb-4" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      </div>
+
+      <div className="flex justify-start items-start gap-4 mb-4">
+        <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+        <div className="w-full">
+          <Skeleton className="h-4 w-28 mb-4" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      </div>
+
+      <div className="flex justify-start items-start gap-4">
+        <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+        <div className="w-full">
+          <Skeleton className="h-4 w-28 mb-4" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      </div>
     </div>
   );
 };
