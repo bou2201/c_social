@@ -28,7 +28,13 @@ const LightboxDynamic = dynamic(() => import('@/components/images').then((res) =
 
 const MAX_LENGTH_CONTENT = 400;
 
-export const PostItem = ({ data, queryId }: { data: PostResponse; queryId: string }) => {
+type PostItemProps = {
+  data: PostResponse;
+  queryId: string;
+  index: number;
+};
+
+export const PostItem = ({ data, queryId, index }: PostItemProps) => {
   const [imageIndex, setImageIndex] = useState<number>(-1);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
@@ -45,7 +51,7 @@ export const PostItem = ({ data, queryId }: { data: PostResponse; queryId: strin
   const { author, content, files, createdAt, likes, id, total_comment } = data;
 
   const onCopyUrl = useCallback(async () => {
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(`${window.location.href}/${author.username}/${id}`);
     toast({
       description: (
         <div className="flex justify-center items-center gap-3">
@@ -54,7 +60,7 @@ export const PostItem = ({ data, queryId }: { data: PostResponse; queryId: strin
         </div>
       ),
     });
-  }, [toast]);
+  }, [author.username, id, toast]);
 
   const getOptions = useMemo(() => {
     const userOptions: DisplayDropdownItemProps[] = [
@@ -148,7 +154,13 @@ export const PostItem = ({ data, queryId }: { data: PostResponse; queryId: strin
 
   return (
     <>
-      <div className="max-sm:py-4 py-5 max-sm:px-4 px-6 border-t-csol_black/10 dark:border-t-csol_white/10 border-t-[1px]">
+      <div
+        className={`max-sm:py-4 py-5 max-sm:px-4 px-6 ${
+          user && index !== 0
+            ? 'border-t-csol_black/10 dark:border-t-csol_white/10 border-t-[1px]'
+            : ''
+        }`}
+      >
         <div className="flex justify-start items-start gap-4">
           <Link href={`${Router.ProfilePage}/${author.username}`}>
             <Avatar className="h-10 w-10 flex-shrink-0">

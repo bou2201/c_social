@@ -4,6 +4,7 @@ import { PostResponse } from '@/modules/post';
 import { getNumberFormat } from '@/utils/func';
 import { MessageCircle } from 'lucide-react';
 import { useRouter } from 'next-nprogress-bar';
+import { memo } from 'react';
 
 type CommentBtnProps = {
   author: PostResponse['author'];
@@ -11,7 +12,7 @@ type CommentBtnProps = {
   totalComment: number;
 };
 
-export const CommentBtn = ({ author, postId, totalComment }: CommentBtnProps) => {
+export const CommentBtn = memo(({ author, postId, totalComment }: CommentBtnProps) => {
   const router = useRouter();
 
   return (
@@ -25,4 +26,6 @@ export const CommentBtn = ({ author, postId, totalComment }: CommentBtnProps) =>
       {totalComment > 0 && <span className="opacity-70">{getNumberFormat(totalComment)}</span>}
     </Button>
   );
-};
+});
+
+CommentBtn.displayName = CommentBtn.name;

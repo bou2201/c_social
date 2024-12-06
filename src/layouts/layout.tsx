@@ -17,10 +17,12 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { PopoverClose } from '@radix-ui/react-popover';
 import LoadingPage from '@/app/loading';
 import { useRouter } from 'next-nprogress-bar';
+import DrawerAlertAuth from '@/app/drawer-alert-auth';
 
 export const AppLayout = () => {
   const [openSheet, setOpenSheet] = useState<boolean>(false);
   const [openPopoverAvt, setOpenPopoverAvt] = useState<boolean>(false);
+  const [openAlertAuth, setOpenAlertAuth] = useState<boolean>(false);
 
   const { signOut } = useClerk();
   const { user } = useUser();
@@ -58,7 +60,7 @@ export const AppLayout = () => {
           if (user) {
             setOpenPostDialog(true);
           } else {
-            router.push(Router.SignIn);
+            setOpenAlertAuth(true);
           }
         },
       },
@@ -70,7 +72,7 @@ export const AppLayout = () => {
           if (user) {
             router.push(Router.Notifications);
           } else {
-            router.push(Router.SignIn);
+            setOpenAlertAuth(true);
           }
         },
       },
@@ -82,7 +84,7 @@ export const AppLayout = () => {
           if (user) {
             router.push(Router.ProfilePage + '/' + user?.username);
           } else {
-            router.push(Router.SignIn);
+            setOpenAlertAuth(true);
           }
         },
       },
@@ -109,7 +111,7 @@ export const AppLayout = () => {
           if (user) {
             router.push(Router.Notifications);
           } else {
-            router.push(Router.SignIn);
+            setOpenAlertAuth(true);
           }
         },
       },
@@ -121,7 +123,7 @@ export const AppLayout = () => {
           if (user) {
             router.push(Router.ProfilePage + '/' + user?.username);
           } else {
-            router.push(Router.SignIn);
+            setOpenAlertAuth(true);
           }
         },
       },
@@ -245,16 +247,21 @@ export const AppLayout = () => {
           )}
         </div>
       </header>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setOpenPostDialog(true)}
-        className="w-12 h-12 fixed max-md:hidden bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground hover:scale-125 transform-gpu"
-      >
-        <Plus className="w-6 h-w-6 opacity-70 " />
-      </Button>
+
+      {user && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpenPostDialog(true)}
+          className="w-12 h-12 fixed max-md:hidden bottom-6 right-6 bg-csol_white_foreground dark:bg-csol_black_foreground hover:scale-125 transform-gpu"
+        >
+          <Plus className="w-6 h-w-6 opacity-70 " />
+        </Button>
+      )}
 
       {openPostDialog && <PostDialog open={openPostDialog} setOpen={setOpenPostDialog} />}
+
+      <DrawerAlertAuth open={openAlertAuth} setOpen={setOpenAlertAuth} />
     </>
   );
 };

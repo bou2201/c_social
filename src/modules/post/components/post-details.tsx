@@ -142,7 +142,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute left-1 rounded-full w-8 h-8"
+            className="absolute left-4 rounded-full w-8 h-8"
             onClick={() => router.back()}
           >
             <MoveLeft className="w-4 h-4 opacity-70" />
@@ -290,7 +290,7 @@ export const PostDetails = ({ postId }: { postId: string }) => {
               </section>
             )}
 
-            <CommentForm postDetails={postDetails?.data as PostResponse} />
+            {user && <CommentForm postDetails={postDetails?.data as PostResponse} />}
           </div>
         )}
       </div>

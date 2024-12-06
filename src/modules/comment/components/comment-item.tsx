@@ -13,6 +13,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next-nprogress-bar';
 import { $Enums } from '@prisma/client';
 import { CldImage, CldVideoPlayer } from '@/components/images';
+import { useUser } from '@clerk/nextjs';
 
 const LightboxDynamic = dynamic(() => import('@/components/images').then((res) => res.Lightbox));
 
@@ -31,6 +32,7 @@ export const CommentItem = ({ data, postId, index }: CommentItemProps) => {
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
 
   const router = useRouter();
+  const { user } = useUser();
   const { author, comment, file, createdAt } = data;
 
   const getOptions = useMemo(() => {
@@ -81,17 +83,19 @@ export const CommentItem = ({ data, postId, index }: CommentItemProps) => {
               </span>
             </div>
 
-            <DisplayDropdown
-              open={openDropdown}
-              setOpen={setOpenDropdown}
-              trigger={
-                <Button size="icon" variant="ghost" className="h-7 w-7">
-                  <Ellipsis className="w-4 h-4 opacity-80" />
-                </Button>
-              }
-              items={getOptions}
-              modal={false}
-            />
+            {user && (
+              <DisplayDropdown
+                open={openDropdown}
+                setOpen={setOpenDropdown}
+                trigger={
+                  <Button size="icon" variant="ghost" className="h-7 w-7">
+                    <Ellipsis className="w-4 h-4 opacity-80" />
+                  </Button>
+                }
+                items={getOptions}
+                modal={false}
+              />
+            )}
           </div>
 
           <div
