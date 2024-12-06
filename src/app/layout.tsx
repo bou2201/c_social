@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import localFont from 'next/font/local';
 import { Toaster, TooltipProvider } from '@/components/ui';
 import { QueryProvider, ThemeProvider, ClerkProvider } from '@/provider';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import '@/styles/globals.css';
 import '@/styles/index.css';
@@ -85,7 +86,10 @@ export default function RootLayout({
       <QueryProvider>
         <html lang="en" suppressHydrationWarning>
           <head>
-            <link rel="stylesheet" href="https://unpkg.com/cloudinary-video-player@2.1.0/dist/cld-video-player.css" />
+            <link
+              rel="stylesheet"
+              href="https://unpkg.com/cloudinary-video-player@2.1.0/dist/cld-video-player.css"
+            />
           </head>
           <body
             className={`${quickSandFont.className} ${geistMono.variable} ${geistSans.variable} antialiased`}
@@ -101,6 +105,8 @@ export default function RootLayout({
               </NProgressProviderDynamic>
               <Toaster />
             </ThemeProvider>
+
+            <SpeedInsights />
           </body>
         </html>
       </QueryProvider>
