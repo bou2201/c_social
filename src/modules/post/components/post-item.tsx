@@ -31,9 +31,10 @@ const MAX_LENGTH_CONTENT = 400;
 type PostItemProps = {
   data: PostResponse;
   queryId: string;
+  index: number;
 };
 
-export const PostItem = ({ data, queryId }: PostItemProps) => {
+export const PostItem = ({ data, queryId, index }: PostItemProps) => {
   const [imageIndex, setImageIndex] = useState<number>(-1);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
@@ -155,7 +156,7 @@ export const PostItem = ({ data, queryId }: PostItemProps) => {
     <>
       <div
         className={`max-sm:py-4 py-5 max-sm:px-4 px-6 ${
-          user
+          user || index > 0
             ? 'border-t-csol_black/10 dark:border-t-csol_white/10 border-t-[1px]'
             : ''
         }`}
