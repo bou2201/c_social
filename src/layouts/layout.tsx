@@ -38,7 +38,7 @@ export const AppLayout = () => {
   });
 
   const { mutate: executeLogout, isPending: isLoadingLogout } = useMutation({
-    mutationFn: () => signOut({ redirectUrl: Router.SignIn }),
+    mutationFn: () => signOut({ redirectUrl: Router.Home }),
   });
 
   const HEADER_NAVIGATION: NavLinkProps[] = useMemo(() => {

@@ -50,11 +50,11 @@ export const PostList = ({ id = 'all' }: { id: string }) => {
           page?.data?.map((post, index) =>
             checkLastViewRef(index, page) ? (
               <div ref={ref} key={post.id}>
-                <PostItem data={post} queryId={id} index={index} />
+                <PostItem data={post} queryId={id} />
               </div>
             ) : (
               <div key={post.id}>
-                <PostItem data={post} queryId={id} index={index} />
+                <PostItem data={post} queryId={id} />
               </div>
             ),
           ),
